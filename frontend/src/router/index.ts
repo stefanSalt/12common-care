@@ -4,12 +4,18 @@ import AdminLayout from '../layouts/AdminLayout.vue'
 import FrontendLayout from '../layouts/FrontendLayout.vue'
 import HomeView from '../views/home/HomeView.vue'
 import LoginView from '../views/login/LoginView.vue'
+import FilesView from '../views/admin/FilesView.vue'
+import NotificationsView from '../views/admin/NotificationsView.vue'
+import PermissionsView from '../views/admin/PermissionsView.vue'
+import RolesView from '../views/admin/RolesView.vue'
+import UsersView from '../views/admin/UsersView.vue'
 import { useUserStore } from '../stores/user'
 
 declare module 'vue-router' {
   interface RouteMeta {
     public?: boolean
     requiresAuth?: boolean
+    permission?: string
   }
 }
 
@@ -48,6 +54,36 @@ const router = createRouter({
           path: '',
           name: 'admin-home',
           component: HomeView,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'users',
+          name: 'admin-users',
+          component: UsersView,
+          meta: { requiresAuth: true, permission: 'user:list' },
+        },
+        {
+          path: 'roles',
+          name: 'admin-roles',
+          component: RolesView,
+          meta: { requiresAuth: true, permission: 'role:list' },
+        },
+        {
+          path: 'permissions',
+          name: 'admin-permissions',
+          component: PermissionsView,
+          meta: { requiresAuth: true, permission: 'permission:list' },
+        },
+        {
+          path: 'files',
+          name: 'admin-files',
+          component: FilesView,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'notifications',
+          name: 'admin-notifications',
+          component: NotificationsView,
           meta: { requiresAuth: true },
         },
       ],

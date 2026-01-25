@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 import { storage } from '../utils/storage'
 
 export interface RoleDto {
-  id: number
+  id: string
   code: string
   name: string
 }
 
 export interface UserDto {
-  id: number
+  id: string
   username: string
   nickname?: string
   email?: string
@@ -48,4 +48,3 @@ export const useUserStore = defineStore('user', {
     },
   },
 })
-
