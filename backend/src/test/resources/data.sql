@@ -14,6 +14,9 @@ MERGE INTO sys_user (id, username, password, nickname, email, phone, status, del
 MERGE INTO sys_role (id, code, name, description, deleted) KEY(id)
 VALUES (10, 'admin', '管理员', '系统管理员', 0);
 
+MERGE INTO sys_role (id, code, name, description, deleted) KEY(id)
+VALUES (11, 'user', '普通用户', '普通用户', 0);
+
 MERGE INTO sys_user_role (id, user_id, role_id) KEY(id)
 VALUES (1000, 1, 10);
 

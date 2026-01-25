@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import type { UploadProps } from 'element-plus'
 import { ElMessage } from 'element-plus'
-import { me, updateMe } from '../../api/auth'
+import { changePassword, me, updateMe } from '../../api/auth'
 import { useUserStore } from '../../stores/user'
 
 const userStore = useUserStore()
@@ -68,6 +68,41 @@ async function onSave() {
   }
 }
 
+const changingPassword = ref(false)
+const passwordForm = reactive({
+  oldPassword: '',
+  newPassword: '',
+  confirmPassword: '',
+})
+
+async function onChangePassword() {
+  const oldPassword = passwordForm.oldPassword
+  const newPassword = passwordForm.newPassword
+  const confirmPassword = passwordForm.confirmPassword
+
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    ElMessage.error('请填写完整的密码信息')
+    return
+  }
+  if (newPassword !== confirmPassword) {
+    ElMessage.error('两次输入的新密码不一致')
+    return
+  }
+
+  changingPassword.value = true
+  try {
+    await changePassword({ oldPassword, newPassword })
+    passwordForm.oldPassword = ''
+    passwordForm.newPassword = ''
+    passwordForm.confirmPassword = ''
+    ElMessage.success('密码已修改')
+  } catch (e: any) {
+    ElMessage.error(e?.message ?? '修改失败')
+  } finally {
+    changingPassword.value = false
+  }
+}
+
 const onAvatarUploadSuccess: UploadProps['onSuccess'] = (response: any) => {
   if (response && response.code === 0 && response.data) {
     userStore.setUser(response.data)
@@ -123,6 +158,24 @@ const onAvatarUploadError: UploadProps['onError'] = () => {
       <div style="display: flex; gap: 8px">
         <el-button type="primary" :loading="saving" @click="onSave">保存</el-button>
         <el-button :disabled="loading" @click="loadMe">刷新</el-button>
+      </div>
+
+      <el-divider />
+
+      <div style="font-weight: 600; margin-bottom: 12px">修改密码</div>
+      <el-form label-position="top" style="max-width: 520px">
+        <el-form-item label="原密码">
+          <el-input v-model="passwordForm.oldPassword" type="password" autocomplete="current-password" show-password />
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="passwordForm.newPassword" type="password" autocomplete="new-password" show-password />
+        </el-form-item>
+        <el-form-item label="确认新密码">
+          <el-input v-model="passwordForm.confirmPassword" type="password" autocomplete="new-password" show-password />
+        </el-form-item>
+      </el-form>
+      <div>
+        <el-button type="primary" :loading="changingPassword" @click="onChangePassword">修改密码</el-button>
       </div>
     </el-card>
   </div>

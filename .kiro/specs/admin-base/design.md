@@ -349,8 +349,16 @@ request.interceptors.response.use(
 | 方法 | 路径 | 描述 | 权限 |
 |------|------|------|------|
 | POST | /api/auth/login | 用户登录 | 公开 |
+| POST | /api/auth/register | 用户注册（注册成功后自动登录） | 公开 |
 | POST | /api/auth/refresh | 刷新 Token | 公开 |
 | GET | /api/auth/me | 获取当前用户信息 | 登录 |
+| PUT | /api/auth/me | 更新自己的个人信息 | 登录 |
+| POST | /api/auth/me/avatar | 上传自己的头像（PUBLIC） | 登录 |
+| PUT | /api/auth/me/password | 修改自己的密码 | 登录 |
+
+> 说明：
+> - 用户注册默认赋予角色 `code=user`（`name=普通用户`），用于前台普通用户访问。
+> - 注册成功后返回与登录一致的响应结构（`token + refreshToken + user`），以支持前端“注册后自动登录”。
 
 #### 用户管理接口
 

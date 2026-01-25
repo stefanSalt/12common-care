@@ -1,7 +1,9 @@
 package com.example.admin.service.impl;
 
+import com.example.admin.dto.auth.ChangePasswordRequest;
 import com.example.admin.dto.auth.LoginRequest;
 import com.example.admin.dto.auth.LoginResponseData;
+import com.example.admin.dto.auth.RegisterRequest;
 import com.example.admin.dto.auth.RefreshRequest;
 import com.example.admin.dto.auth.RefreshResponseData;
 import com.example.admin.dto.auth.UpdateMeRequest;
@@ -50,6 +52,11 @@ public class InMemoryAuthService implements AuthService {
         data.setRefreshToken(refreshToken);
         data.setUser(user.toUserDto());
         return data;
+    }
+
+    @Override
+    public LoginResponseData register(RegisterRequest request) {
+        throw new UnsupportedOperationException("inmem profile does not support register");
     }
 
     @Override
@@ -105,5 +112,10 @@ public class InMemoryAuthService implements AuthService {
     @Override
     public UserDto uploadMyAvatar(UserPrincipal principal, MultipartFile file) {
         throw new UnsupportedOperationException("inmem profile does not support uploadMyAvatar");
+    }
+
+    @Override
+    public void changePassword(UserPrincipal principal, ChangePasswordRequest request) {
+        throw new UnsupportedOperationException("inmem profile does not support changePassword");
     }
 }

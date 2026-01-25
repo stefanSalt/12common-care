@@ -4,6 +4,7 @@ import AdminLayout from '../layouts/AdminLayout.vue'
 import FrontendLayout from '../layouts/FrontendLayout.vue'
 import HomeView from '../views/home/HomeView.vue'
 import LoginView from '../views/login/LoginView.vue'
+import RegisterView from '../views/register/RegisterView.vue'
 import FilesView from '../views/admin/FilesView.vue'
 import NotificationsView from '../views/admin/NotificationsView.vue'
 import PermissionsView from '../views/admin/PermissionsView.vue'
@@ -26,6 +27,11 @@ const router = createRouter({
     {
       path: '/login',
       component: LoginView,
+      meta: { public: true },
+    },
+    {
+      path: '/register',
+      component: RegisterView,
       meta: { public: true },
     },
     {

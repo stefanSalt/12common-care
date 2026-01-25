@@ -22,6 +22,9 @@ VALUES (
 INSERT INTO sys_role (id, code, name, description, deleted)
 VALUES (10, 'admin', '管理员', '系统管理员', 0);
 
+INSERT INTO sys_role (id, code, name, description, deleted)
+VALUES (11, 'user', '普通用户', '普通用户', 0);
+
 INSERT INTO sys_user_role (id, user_id, role_id)
 VALUES (1000, 1, 10);
 
@@ -58,4 +61,3 @@ INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2022, 10, 1
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2023, 10, 123);
 
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2030, 10, 130);
-

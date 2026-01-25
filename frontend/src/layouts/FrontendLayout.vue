@@ -32,8 +32,9 @@ function logout() {
         <el-button size="small" @click="goProfile">个人信息</el-button>
         <el-button size="small" type="primary" plain @click="logout">退出</el-button>
       </div>
-      <div v-else>
+      <div v-else style="display: flex; gap: 8px">
         <el-button size="small" type="primary" @click="router.push('/login')">登录</el-button>
+        <el-button size="small" type="primary" plain @click="router.push('/register')">注册</el-button>
       </div>
     </header>
     <main style="flex: 1; padding: 16px">

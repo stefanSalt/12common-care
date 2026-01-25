@@ -1,8 +1,10 @@
 package com.example.admin.controller;
 
 import com.example.admin.common.Result;
+import com.example.admin.dto.auth.ChangePasswordRequest;
 import com.example.admin.dto.auth.LoginRequest;
 import com.example.admin.dto.auth.LoginResponseData;
+import com.example.admin.dto.auth.RegisterRequest;
 import com.example.admin.dto.auth.RefreshRequest;
 import com.example.admin.dto.auth.RefreshResponseData;
 import com.example.admin.dto.auth.UpdateMeRequest;
@@ -35,6 +37,11 @@ public class AuthController {
         return Result.ok(authService.login(request));
     }
 
+    @PostMapping("/register")
+    public Result<LoginResponseData> register(@Valid @RequestBody RegisterRequest request) {
+        return Result.ok(authService.register(request));
+    }
+
     @PostMapping("/refresh")
     public Result<RefreshResponseData> refresh(@Valid @RequestBody RefreshRequest request) {
         return Result.ok(authService.refresh(request));
@@ -59,5 +66,14 @@ public class AuthController {
             @RequestPart("file") MultipartFile file
     ) {
         return Result.ok(authService.uploadMyAvatar(principal, file));
+    }
+
+    @PutMapping("/me/password")
+    public Result<Void> changeMyPassword(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        authService.changePassword(principal, request);
+        return Result.ok(null);
     }
 }

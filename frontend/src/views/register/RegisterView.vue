@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { login } from '../../api/auth'
+import { register } from '../../api/auth'
 import { useUserStore } from '../../stores/user'
 
 const userStore = useUserStore()
 const router = useRouter()
-const route = useRoute()
 
 const loading = ref(false)
 const formRef = ref<FormInstance>()
 const form = reactive({
-  username: 'admin',
-  password: 'admin123',
+  username: '',
+  password: '',
+  nickname: '',
 })
 
 const requiredTrim = (message: string) => {
@@ -41,21 +41,21 @@ async function onSubmit() {
 
   loading.value = true
   try {
-    const data = await login(form.username.trim(), form.password)
+    const data = await register({
+      username: form.username.trim(),
+      password: form.password,
+      nickname: form.nickname.trim() || null,
+    })
     userStore.setTokens(data.token, data.refreshToken)
     userStore.setUser(data.user)
 
-    const isAdmin = (data.user.roles ?? []).some((r) => r.code === 'admin')
-    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+    ElMessage.success('注册成功')
 
-    // Default: admin -> /admin ; others -> /
-    if (isAdmin) {
-      await router.replace(redirect.startsWith('/admin') ? redirect : '/admin')
-    } else {
-      await router.replace('/')
-    }
+    const isAdmin = (data.user.roles ?? []).some((r) => r.code === 'admin')
+    if (isAdmin) await router.replace('/admin')
+    else await router.replace('/')
   } catch (e: any) {
-    ElMessage.error(e?.message ?? '登录失败')
+    ElMessage.error(e?.message ?? '注册失败')
   } finally {
     loading.value = false
   }
@@ -68,19 +68,22 @@ async function onSubmit() {
   >
     <el-card style="width: 360px">
       <template #header>
-        <div>登录</div>
+        <div>注册</div>
       </template>
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="onSubmit">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" autocomplete="username" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" type="password" autocomplete="current-password" show-password />
+          <el-input v-model="form.password" type="password" autocomplete="new-password" show-password />
         </el-form-item>
-        <el-button type="primary" style="width: 100%" :loading="loading" @click="onSubmit">登录</el-button>
+        <el-form-item label="昵称">
+          <el-input v-model="form.nickname" autocomplete="off" />
+        </el-form-item>
+        <el-button type="primary" style="width: 100%" :loading="loading" @click="onSubmit">注册</el-button>
       </el-form>
       <div style="margin-top: 12px; text-align: center">
-        <el-link type="primary" @click="router.push('/register')">没有账号？去注册</el-link>
+        <el-link type="primary" @click="router.push('/login')">已有账号？去登录</el-link>
       </div>
     </el-card>
   </div>

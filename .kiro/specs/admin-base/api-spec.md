@@ -56,6 +56,12 @@
 { "username": "stefan", "password": "******" }
 ```
 
+#### RegisterRequest
+
+```json
+{ "username": "alice", "password": "******", "nickname": "Alice" }
+```
+
 #### LoginResponseData
 
 ```json
@@ -86,6 +92,12 @@
 { "token": "eyJhbGciOi...", "refreshToken": "eyJhbGciOi..." }
 ```
 
+#### ChangePasswordRequest
+
+```json
+{ "oldPassword": "******", "newPassword": "******" }
+```
+
 ### 3.2 分页
 
 分页查询统一使用 query 参数：
@@ -105,6 +117,15 @@
 - Errors：
   - 1001 用户不存在
   - 1003 密码错误
+
+#### POST /api/auth/register（公开）
+
+- 用途：用户注册；注册成功后自动登录（返回 token + refreshToken + user）。  
+- Request：`RegisterRequest`
+- Response：`Result<LoginResponseData>`
+- Errors：
+  - 1002 用户名已存在
+  - 1004 角色不存在（默认角色 code=user 不存在时）
 
 #### POST /api/auth/refresh（公开）
 
@@ -135,6 +156,14 @@
 - Form fields：
   - `file`: 头像文件
 - Response：`Result<LoginResponseData.user>`（其中 `avatarFileId` 指向 `sys_file.id`，头像可通过 `/api/files/{id}/download` 访问）
+
+#### PUT /api/auth/me/password（登录）
+
+- 用途：修改自己的密码（需要校验 oldPassword）。
+- Request：`ChangePasswordRequest`
+- Response：`Result<Void>`
+- Errors：
+  - 1003 原密码错误
 
 ### 4.2 用户管理（需要权限）
 
