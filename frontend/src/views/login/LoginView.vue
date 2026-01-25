@@ -22,8 +22,15 @@ async function onSubmit() {
     userStore.setTokens(data.token, data.refreshToken)
     userStore.setUser(data.user)
 
-    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
-    await router.replace(redirect)
+    const isAdmin = (data.user.roles ?? []).some((r) => r.code === 'admin')
+    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+
+    // Default: admin -> /admin ; others -> /
+    if (isAdmin) {
+      await router.replace(redirect.startsWith('/admin') ? redirect : '/admin')
+    } else {
+      await router.replace('/')
+    }
   } catch (e: any) {
     ElMessage.error(e?.message ?? '登录失败')
   } finally {
@@ -50,4 +57,3 @@ async function onSubmit() {
     </el-card>
   </div>
 </template>
-

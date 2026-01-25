@@ -1,5 +1,7 @@
+import { defineComponent, h } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import AdminLayout from '../layouts/AdminLayout.vue'
+import FrontendLayout from '../layouts/FrontendLayout.vue'
 import HomeView from '../views/home/HomeView.vue'
 import LoginView from '../views/login/LoginView.vue'
 import { useUserStore } from '../stores/user'
@@ -21,12 +23,30 @@ const router = createRouter({
     },
     {
       path: '/',
+      component: FrontendLayout,
+      meta: { public: true },
+      children: [
+        {
+          path: '',
+          name: 'front-home',
+          component: defineComponent({
+            name: 'FrontHomePlaceholder',
+            setup() {
+              return () => h('div', 'Front Layout Placeholder')
+            },
+          }),
+          meta: { public: true },
+        },
+      ],
+    },
+    {
+      path: '/admin',
       component: AdminLayout,
       meta: { requiresAuth: true },
       children: [
         {
           path: '',
-          name: 'home',
+          name: 'admin-home',
           component: HomeView,
           meta: { requiresAuth: true },
         },
@@ -54,4 +74,3 @@ router.beforeEach((to) => {
 })
 
 export default router
-
