@@ -13,18 +13,18 @@
 
 - [x] GitHub 远端仓库 URL：`git@github.com:stefanSalt/base-admin.git`
 - [x] 远端仓库是否为空仓库：是
-- [ ] 分支名：main（默认）
+- [x] 分支名：main（默认）
 
 ## 执行步骤（等待你回复“开始执行”后再跑）
 
 - [x] `git init -b main`
-- [ ] `git add -A`
-- [ ] `git commit -m "chore: initial commit"`
-- [ ] `git remote add origin <REMOTE_URL>`
-- [ ] `git push -u origin main`
+- [x] `git add -A`
+- [x] `git commit -m "chore: initial commit"`
+- [x] `git remote add origin <REMOTE_URL>`
+- [x] `git push -u origin main`
 
 ## 验证
 
-- [ ] `git status` 显示 clean
-- [ ] `git remote -v` 正确
+- [x] `git status` 显示 clean
+- [x] `git remote -v` 正确
 - [ ] GitHub 页面可看到 main 分支与提交记录
