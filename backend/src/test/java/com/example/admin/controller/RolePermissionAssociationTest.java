@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,7 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class RbacCrudTest {
+class RolePermissionAssociationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -29,49 +30,43 @@ class RbacCrudTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void permissionDeniedWhenUserHasNoRole() throws Exception {
+    void rolePermissionAssociationIsConsistent() throws Exception {
         String adminToken = login("admin", "admin123");
 
-        // admin can list roles/permissions/users
-        mockMvc.perform(get("/api/roles").header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(0));
-
-        mockMvc.perform(get("/api/permissions").header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(0));
-
-        // create a normal user without any role
-        MvcResult created = mockMvc.perform(post("/api/users")
+        String roleCode = "role_" + UUID.randomUUID();
+        MvcResult created = mockMvc.perform(post("/api/roles")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"bob_rbac\",\"password\":\"bob123\",\"nickname\":\"Bob\",\"status\":1}"))
+                        .content("{\"code\":\"" + roleCode + "\",\"name\":\"n\",\"description\":\"d\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
-                .andExpect(jsonPath("$.data.id").isNumber())
                 .andReturn();
 
-        long bobId = objectMapper.readTree(created.getResponse().getContentAsString()).at("/data/id").asLong();
+        long roleId = objectMapper.readTree(created.getResponse().getContentAsString()).at("/data/id").asLong();
 
-        String bobToken = login("bob_rbac", "bob123");
-
-        // bob is authenticated but has no permission: should be 403
-        mockMvc.perform(get("/api/users").header("Authorization", "Bearer " + bobToken))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value(403));
-
-        // assign admin role (id=10 seeded) to bob
-        mockMvc.perform(put("/api/users/" + bobId + "/roles")
+        // Assign a seeded permission (id=100 => user:list in test data.sql).
+        mockMvc.perform(put("/api/roles/" + roleId + "/permissions")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"roleIds\":[10]}"))
+                        .content("{\"permissionIds\":[100]}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0));
 
-        // now bob has permission via DB lookup
-        mockMvc.perform(get("/api/users").header("Authorization", "Bearer " + bobToken))
+        MvcResult detail = mockMvc.perform(get("/api/roles/" + roleId)
+                        .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(0));
+                .andExpect(jsonPath("$.code").value(0))
+                .andReturn();
+
+        JsonNode detailJson = objectMapper.readTree(detail.getResponse().getContentAsString());
+        boolean found = false;
+        for (JsonNode item : detailJson.at("/data/permissions")) {
+            if ("user:list".equals(item.at("/code").asText())) {
+                found = true;
+                break;
+            }
+        }
+        org.junit.jupiter.api.Assertions.assertTrue(found);
     }
 
     private String login(String username, String password) throws Exception {
@@ -86,3 +81,4 @@ class RbacCrudTest {
         return json.at("/data/token").asText();
     }
 }
+

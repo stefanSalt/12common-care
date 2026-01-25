@@ -18,7 +18,8 @@ app:
     access-token-ttl-seconds: 86400
     refresh-token-ttl-seconds: 2592000
   file:
-    storage-path: ${FILE_STORAGE_PATH:./data/files}
+    # Default to ./storage when running from backend/ (maps to backend/storage/)
+    storage-path: ${FILE_STORAGE_PATH:./storage}
 
 springdoc:
   swagger-ui:

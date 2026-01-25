@@ -15,4 +15,5 @@ app:
     issuer: admin-base-test
     access-token-ttl-seconds: 86400
     refresh-token-ttl-seconds: 2592000
-
+  file:
+    storage-path: target/test-files

@@ -83,6 +83,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
+                        // WebSocket handshake is authenticated by query token (not Authorization header).
+                        .requestMatchers("/ws/**").permitAll()
                         // Public file download must allow anonymous.
                         .requestMatchers(HttpMethod.GET, "/api/files/*/download").permitAll()
                         .anyRequest().authenticated()
