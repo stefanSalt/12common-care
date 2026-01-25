@@ -11,6 +11,7 @@
 - MyBatis-Plus 3.5.x
 - MySQL 8.0
 - JWT (jjwt 0.12.x)
+- Lombok
 - Spring WebSocket
 - SpringDoc OpenAPI 2.x
 
@@ -21,6 +22,18 @@
 - Vue Router 4.x
 - Element Plus 2.x
 - Axios
+
+**后端约定：**
+- 使用 Lombok 简化样板代码（例如实体/DTO 的 `@Data` 等），并确保 IDE 启用 Annotation Processing。
+- Maven 依赖示例（版本由 Spring Boot 依赖管理统一控制）：
+
+```xml
+<dependency>
+  <groupId>org.projectlombok</groupId>
+  <artifactId>lombok</artifactId>
+  <scope>provided</scope>
+</dependency>
+```
 
 ## 架构
 
