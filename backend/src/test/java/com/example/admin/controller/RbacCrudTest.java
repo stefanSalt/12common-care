@@ -48,7 +48,7 @@ class RbacCrudTest {
                         .content("{\"username\":\"bob_rbac\",\"password\":\"bob123\",\"nickname\":\"Bob\",\"status\":1}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
-                .andExpect(jsonPath("$.data.id").isNumber())
+                .andExpect(jsonPath("$.data.id").isString())
                 .andReturn();
 
         long bobId = objectMapper.readTree(created.getResponse().getContentAsString()).at("/data/id").asLong();
