@@ -8,10 +8,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Builder;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("inmem")
 public class InMemoryUserStore {
 
     private final PasswordEncoder passwordEncoder;
@@ -102,4 +104,3 @@ public class InMemoryUserStore {
         }
     }
 }
-

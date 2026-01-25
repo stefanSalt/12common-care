@@ -7,13 +7,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(properties = {
-        "app.jwt.secret=01234567890123456789012345678901",
-        "app.jwt.issuer=admin-base-test",
-        "app.jwt.access-token-ttl-seconds=86400",
-        "app.jwt.refresh-token-ttl-seconds=2592000"
-})
+@SpringBootTest
+@ActiveProfiles("test")
 class JwtTokenProviderTest {
 
     @Autowired

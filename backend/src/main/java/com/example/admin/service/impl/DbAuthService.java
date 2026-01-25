@@ -1,52 +1,65 @@
 package com.example.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.admin.dto.auth.LoginRequest;
 import com.example.admin.dto.auth.LoginResponseData;
 import com.example.admin.dto.auth.RefreshRequest;
 import com.example.admin.dto.auth.RefreshResponseData;
 import com.example.admin.dto.user.UserDto;
+import com.example.admin.entity.SysUser;
 import com.example.admin.exception.BusinessException;
+import com.example.admin.mapper.SysUserMapper;
 import com.example.admin.security.JwtTokenProvider;
 import com.example.admin.security.UserPrincipal;
 import com.example.admin.service.AuthService;
+import com.example.admin.service.UserService;
 import io.jsonwebtoken.Claims;
-import org.springframework.context.annotation.Profile;
-import org.springframework.security.authentication.BadCredentialsException;
+import java.util.List;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile("inmem")
-public class InMemoryAuthService implements AuthService {
+public class DbAuthService implements AuthService {
 
-    private final InMemoryUserStore userStore;
+    private final SysUserMapper userMapper;
+    private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
-    public InMemoryAuthService(InMemoryUserStore userStore, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
-        this.userStore = userStore;
+    public DbAuthService(
+            SysUserMapper userMapper,
+            UserService userService,
+            JwtTokenProvider jwtTokenProvider,
+            PasswordEncoder passwordEncoder
+    ) {
+        this.userMapper = userMapper;
+        this.userService = userService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public LoginResponseData login(LoginRequest request) {
-        InMemoryUserStore.UserRecord user = userStore.findByUsername(request.getUsername());
+        SysUser user = userMapper.selectOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getUsername, request.getUsername()));
         if (user == null) {
             throw new BusinessException(1001, "用户不存在");
         }
-        if (!passwordEncoder.matches(request.getPassword(), user.passwordHash())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BusinessException(1003, "密码错误");
         }
 
-        String accessToken = jwtTokenProvider.generateAccessToken(user.id(), user.username(), user.roleCodes());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.id());
+        UserDto userDto = userService.getById(user.getId());
+        List<String> roleCodes = userDto.getRoles() == null ? List.of() : userDto.getRoles().stream().map(r -> r.getCode()).toList();
+
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), roleCodes);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
 
         LoginResponseData data = new LoginResponseData();
         data.setToken(accessToken);
         data.setRefreshToken(refreshToken);
-        data.setUser(user.toUserDto());
+        data.setUser(userDto);
         return data;
     }
 
@@ -68,13 +81,16 @@ public class InMemoryAuthService implements AuthService {
             throw new BadCredentialsException("refresh token invalid");
         }
 
-        InMemoryUserStore.UserRecord user = userStore.findById(userId);
+        SysUser user = userMapper.selectById(userId);
         if (user == null) {
             throw new BadCredentialsException("refresh token invalid");
         }
 
-        String newAccessToken = jwtTokenProvider.generateAccessToken(user.id(), user.username(), user.roleCodes());
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.id());
+        UserDto userDto = userService.getById(userId);
+        List<String> roleCodes = userDto.getRoles() == null ? List.of() : userDto.getRoles().stream().map(r -> r.getCode()).toList();
+
+        String newAccessToken = jwtTokenProvider.generateAccessToken(userId, user.getUsername(), roleCodes);
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(userId);
 
         RefreshResponseData data = new RefreshResponseData();
         data.setToken(newAccessToken);
@@ -87,11 +103,7 @@ public class InMemoryAuthService implements AuthService {
         if (principal == null || principal.userId() == null) {
             throw new AuthenticationCredentialsNotFoundException("未登录");
         }
-
-        InMemoryUserStore.UserRecord user = userStore.findById(principal.userId());
-        if (user == null) {
-            throw new BusinessException(1001, "用户不存在");
-        }
-        return user.toUserDto();
+        return userService.getById(principal.userId());
     }
 }
+

@@ -14,12 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(properties = {
-        "app.jwt.secret=01234567890123456789012345678901",
-        "app.jwt.issuer=admin-base-test"
-})
+@SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class AuthControllerTest {
 
     @Autowired
@@ -75,4 +74,3 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.data.username").value("admin"));
     }
 }
-

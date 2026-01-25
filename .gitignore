@@ -12,6 +12,7 @@
 # Backend (Maven)
 backend/target/
 backend/.jqwik-database
+backend/backend_cp.txt
 
 # Frontend (Node)
 frontend/node_modules/
