@@ -28,4 +28,4 @@
 - [x] PermissionService：从角色→权限表查询权限集合，供 `PermissionAspect` 使用
 - [x] 可验证性：新增最小集成测试（覆盖登录 + 权限拒绝 + CRUD 基本路径）
 - [x] 文档：补充本地启动说明（如何初始化 schema/seed，如何配置 env）
-- [ ] Git：提交并推送到 GitHub `main`
+- [x] Git：提交并推送到 GitHub `main`
