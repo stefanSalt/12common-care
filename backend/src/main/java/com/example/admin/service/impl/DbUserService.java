@@ -157,6 +157,7 @@ public class DbUserService implements UserService {
     private UserDto toDtoNoAuthInfo(SysUser user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
+        dto.setAvatarFileId(user.getAvatarFileId());
         dto.setUsername(user.getUsername());
         dto.setNickname(user.getNickname());
         dto.setEmail(user.getEmail());
@@ -193,4 +194,3 @@ public class DbUserService implements UserService {
         return dto;
     }
 }
-

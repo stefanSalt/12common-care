@@ -20,6 +20,7 @@
 - 未认证：HTTP 401
 - 权限不足：HTTP 403
 - 服务端异常：HTTP 500
+- 为避免 JS number 精度丢失，后端会将所有 `Long` 类型的 ID 字段序列化为 **字符串**（例如 `"2015350336044470273"`）。
 
 `Result<T>` / `PageResult<T>` 结构见 `.kiro/specs/admin-base/design.md`。
 
@@ -62,13 +63,14 @@
   "token": "eyJhbGciOi...",
   "refreshToken": "eyJhbGciOi...",
   "user": {
-    "id": 1,
+    "id": "1",
+    "avatarFileId": "10001",
     "username": "stefan",
     "nickname": "Stefan",
     "email": "stefan@example.com",
     "phone": "13800000000",
     "status": 1,
-    "roles": [{ "id": 10, "code": "admin", "name": "管理员" }],
+    "roles": [{ "id": "10", "code": "admin", "name": "管理员" }],
     "permissions": ["user:list", "user:create"]
   }
 }
@@ -114,6 +116,25 @@
 #### GET /api/auth/me（登录）
 
 - Response：`Result<LoginResponseData.user>`（仅返回 `user` 结构）
+
+#### PUT /api/auth/me（登录）
+
+- 用途：更新自己的个人信息（不需要额外权限，仅需登录）。
+- Request：
+
+```json
+{ "nickname": "Stefan", "email": "stefan@example.com", "phone": "13800000000" }
+```
+
+- Response：`Result<LoginResponseData.user>`
+
+#### POST /api/auth/me/avatar（登录）
+
+- 用途：上传头像（复用文件模块，头像文件默认 **PUBLIC**）。
+- Content-Type：`multipart/form-data`
+- Form fields：
+  - `file`: 头像文件
+- Response：`Result<LoginResponseData.user>`（其中 `avatarFileId` 指向 `sys_file.id`，头像可通过 `/api/files/{id}/download` 访问）
 
 ### 4.2 用户管理（需要权限）
 
@@ -281,4 +302,3 @@
 ```
 
 - Response：`Result<Void>`
-

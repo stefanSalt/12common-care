@@ -9,6 +9,7 @@ export interface RoleDto {
 
 export interface UserDto {
   id: string
+  avatarFileId?: string
   username: string
   nickname?: string
   email?: string

@@ -161,7 +161,7 @@ async function submitPermissions() {
 
     <el-card>
       <el-table :data="rows" v-loading="loading" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="200" />
+        <el-table-column prop="id" label="编号" width="200" />
         <el-table-column prop="code" label="编码" width="180" />
         <el-table-column prop="name" label="名称" />
         <el-table-column label="操作" width="280" fixed="right">

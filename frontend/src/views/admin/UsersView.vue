@@ -155,7 +155,7 @@ async function submitRoles() {
 
     <el-card>
       <el-table :data="rows" v-loading="loading" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="200" />
+        <el-table-column prop="id" label="编号" width="200" />
         <el-table-column prop="username" label="用户名" width="160" />
         <el-table-column prop="nickname" label="昵称" />
         <el-table-column label="状态" width="110">

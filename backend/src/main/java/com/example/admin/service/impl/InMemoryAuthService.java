@@ -4,6 +4,7 @@ import com.example.admin.dto.auth.LoginRequest;
 import com.example.admin.dto.auth.LoginResponseData;
 import com.example.admin.dto.auth.RefreshRequest;
 import com.example.admin.dto.auth.RefreshResponseData;
+import com.example.admin.dto.auth.UpdateMeRequest;
 import com.example.admin.dto.user.UserDto;
 import com.example.admin.exception.BusinessException;
 import com.example.admin.security.JwtTokenProvider;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Profile("inmem")
@@ -93,5 +95,15 @@ public class InMemoryAuthService implements AuthService {
             throw new BusinessException(1001, "用户不存在");
         }
         return user.toUserDto();
+    }
+
+    @Override
+    public UserDto updateMe(UserPrincipal principal, UpdateMeRequest request) {
+        throw new UnsupportedOperationException("inmem profile does not support updateMe");
+    }
+
+    @Override
+    public UserDto uploadMyAvatar(UserPrincipal principal, MultipartFile file) {
+        throw new UnsupportedOperationException("inmem profile does not support uploadMyAvatar");
     }
 }

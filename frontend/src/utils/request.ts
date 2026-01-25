@@ -28,7 +28,7 @@ request.interceptors.response.use(
   (response) => {
     const data = response.data as ApiResult<unknown> | undefined
     if (data && typeof data.code === 'number' && data.code !== 0) {
-      return Promise.reject(new Error(data.message || 'request failed'))
+      return Promise.reject(new Error(data.message || '请求失败'))
     }
     return response
   },
@@ -76,4 +76,3 @@ request.interceptors.response.use(
 
 export type { ApiResult }
 export default request
-

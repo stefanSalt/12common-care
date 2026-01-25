@@ -9,6 +9,7 @@ import NotificationsView from '../views/admin/NotificationsView.vue'
 import PermissionsView from '../views/admin/PermissionsView.vue'
 import RolesView from '../views/admin/RolesView.vue'
 import UsersView from '../views/admin/UsersView.vue'
+import ProfileView from '../views/profile/ProfileView.vue'
 import { useUserStore } from '../stores/user'
 
 declare module 'vue-router' {
@@ -38,10 +39,23 @@ const router = createRouter({
           component: defineComponent({
             name: 'FrontHomePlaceholder',
             setup() {
-              return () => h('div', 'Front Layout Placeholder')
+              return () => h('div', '前台占位页面')
             },
           }),
           meta: { public: true },
+        },
+      ],
+    },
+    {
+      path: '/profile',
+      component: FrontendLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          name: 'front-profile',
+          component: ProfileView,
+          meta: { requiresAuth: true },
         },
       ],
     },
@@ -84,6 +98,12 @@ const router = createRouter({
           path: 'notifications',
           name: 'admin-notifications',
           component: NotificationsView,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'profile',
+          name: 'admin-profile',
+          component: ProfileView,
           meta: { requiresAuth: true },
         },
       ],

@@ -17,3 +17,13 @@ export async function me() {
   return res.data.data
 }
 
+export type UpdateMeRequest = {
+  nickname?: string | null
+  email?: string | null
+  phone?: string | null
+}
+
+export async function updateMe(payload: UpdateMeRequest) {
+  const res = await request.put<ApiResult<UserDto>>('/auth/me', payload)
+  return res.data.data
+}

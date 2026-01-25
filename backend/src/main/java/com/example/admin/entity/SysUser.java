@@ -16,6 +16,9 @@ public class SysUser {
 
     private String password;
 
+    /** sys_file.id (avatar), stored as PUBLIC file */
+    private Long avatarFileId;
+
     private String nickname;
 
     private String email;
@@ -28,4 +31,3 @@ public class SysUser {
     @TableLogic
     private Integer deleted;
 }
-

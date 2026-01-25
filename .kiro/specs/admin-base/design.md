@@ -427,6 +427,7 @@ erDiagram
         varchar nickname
         varchar email
         varchar phone
+        bigint avatar_file_id FK
         tinyint status
         tinyint deleted
         datetime created_at
@@ -502,6 +503,8 @@ public class User {
     private String username;
     @JsonIgnore
     private String password;
+    /** sys_file.id (avatar), stored as PUBLIC file */
+    private Long avatarFileId;
     private String nickname;
     private String email;
     private String phone;

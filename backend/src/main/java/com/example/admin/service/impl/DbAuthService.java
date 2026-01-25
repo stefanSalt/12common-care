@@ -5,6 +5,8 @@ import com.example.admin.dto.auth.LoginRequest;
 import com.example.admin.dto.auth.LoginResponseData;
 import com.example.admin.dto.auth.RefreshRequest;
 import com.example.admin.dto.auth.RefreshResponseData;
+import com.example.admin.dto.auth.UpdateMeRequest;
+import com.example.admin.dto.file.FileInfoDto;
 import com.example.admin.dto.user.UserDto;
 import com.example.admin.entity.SysUser;
 import com.example.admin.exception.BusinessException;
@@ -12,6 +14,7 @@ import com.example.admin.mapper.SysUserMapper;
 import com.example.admin.security.JwtTokenProvider;
 import com.example.admin.security.UserPrincipal;
 import com.example.admin.service.AuthService;
+import com.example.admin.service.FileService;
 import com.example.admin.service.UserService;
 import io.jsonwebtoken.Claims;
 import java.util.List;
@@ -19,23 +22,27 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class DbAuthService implements AuthService {
 
     private final SysUserMapper userMapper;
     private final UserService userService;
+    private final FileService fileService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
     public DbAuthService(
             SysUserMapper userMapper,
             UserService userService,
+            FileService fileService,
             JwtTokenProvider jwtTokenProvider,
             PasswordEncoder passwordEncoder
     ) {
         this.userMapper = userMapper;
         this.userService = userService;
+        this.fileService = fileService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
     }
@@ -105,5 +112,56 @@ public class DbAuthService implements AuthService {
         }
         return userService.getById(principal.userId());
     }
-}
 
+    @Override
+    public UserDto updateMe(UserPrincipal principal, UpdateMeRequest request) {
+        Long userId = requireUserId(principal);
+        if (request == null) {
+            throw new BusinessException(400, "请求不能为空");
+        }
+
+        SysUser user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(1001, "用户不存在");
+        }
+
+        user.setNickname(normalizeBlankToNull(request.getNickname()));
+        user.setEmail(normalizeBlankToNull(request.getEmail()));
+        user.setPhone(normalizeBlankToNull(request.getPhone()));
+        userMapper.updateById(user);
+
+        return userService.getById(userId);
+    }
+
+    @Override
+    public UserDto uploadMyAvatar(UserPrincipal principal, MultipartFile file) {
+        Long userId = requireUserId(principal);
+
+        SysUser user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(1001, "用户不存在");
+        }
+
+        // Per decision 1A: avatar is stored as a PUBLIC file.
+        FileInfoDto uploaded = fileService.upload(userId, file, "PUBLIC");
+        user.setAvatarFileId(uploaded.getId());
+        userMapper.updateById(user);
+
+        return userService.getById(userId);
+    }
+
+    private Long requireUserId(UserPrincipal principal) {
+        if (principal == null || principal.userId() == null) {
+            throw new AuthenticationCredentialsNotFoundException("未登录");
+        }
+        return principal.userId();
+    }
+
+    private String normalizeBlankToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String v = value.trim();
+        return v.isBlank() ? null : v;
+    }
+}

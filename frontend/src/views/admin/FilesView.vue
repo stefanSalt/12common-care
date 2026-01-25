@@ -32,6 +32,10 @@ onMounted(load)
 
 const visibility = ref<FileVisibility>('PRIVATE')
 
+function visibilityText(v: string) {
+  return v === 'PUBLIC' ? '公开' : '私有'
+}
+
 const uploadHeaders = computed<Record<string, string>>(() => {
   const headers: Record<string, string> = {}
   if (userStore.token) {
@@ -62,7 +66,7 @@ async function onDownload(row: FileInfoDto) {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = row.originalName || 'download'
+    a.download = row.originalName || '下载文件'
     document.body.appendChild(a)
     a.click()
     a.remove()
@@ -94,8 +98,8 @@ async function onDelete(row: FileInfoDto) {
     <el-card>
       <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
         <el-select v-model="visibility" style="width: 140px">
-          <el-option value="PRIVATE" label="PRIVATE" />
-          <el-option value="PUBLIC" label="PUBLIC" />
+          <el-option value="PRIVATE" label="私有" />
+          <el-option value="PUBLIC" label="公开" />
         </el-select>
 
         <el-upload
@@ -112,16 +116,22 @@ async function onDelete(row: FileInfoDto) {
         <el-button @click="load">刷新</el-button>
       </div>
       <div style="margin-top: 8px; color: var(--el-text-color-secondary); font-size: 12px">
-        上传默认 PRIVATE；PUBLIC 文件可匿名下载（后端放行 /api/files/{id}/download）。
+        上传默认私有；公开文件可匿名下载（后端放行 /api/files/{id}/download）。
       </div>
     </el-card>
 
     <el-card>
       <el-table :data="rows" v-loading="loading" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="200" />
+        <el-table-column prop="id" label="编号" width="200" />
         <el-table-column prop="originalName" label="文件名" />
-        <el-table-column prop="size" label="大小(bytes)" width="140" />
-        <el-table-column prop="visibility" label="可见性" width="120" />
+        <el-table-column prop="size" label="大小（字节）" width="140" />
+        <el-table-column label="可见性" width="120">
+          <template #default="{ row }">
+            <el-tag size="small" :type="row.visibility === 'PUBLIC' ? 'success' : 'info'">
+              {{ visibilityText(row.visibility) }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button size="small" :loading="saving" @click="onDownload(row)">下载</el-button>

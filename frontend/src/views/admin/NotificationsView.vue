@@ -75,13 +75,13 @@ async function submitAnnounce() {
         <el-button @click="load">刷新</el-button>
       </div>
       <div style="margin-top: 8px; color: var(--el-text-color-secondary); font-size: 12px">
-        WebSocket 已按 4B 策略：登录成功即建立连接，收到通知会弹窗提示（init + notification）。
+        实时通知已按 4B 策略：登录成功即建立连接，收到通知会弹窗提示。
       </div>
     </el-card>
 
     <el-card>
       <el-table :data="rows" v-loading="loading" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="200" />
+        <el-table-column prop="id" label="编号" width="200" />
         <el-table-column prop="title" label="标题" width="240" />
         <el-table-column prop="type" label="类型" width="140" />
         <el-table-column label="状态" width="120">

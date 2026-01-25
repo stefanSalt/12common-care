@@ -31,6 +31,12 @@ SOURCE <PATH_TO_REPO>/.kiro/specs/admin-base/schema.sql;
 SOURCE <PATH_TO_REPO>/.kiro/specs/admin-base/seed.sql;
 ```
 
+如果你之前已经初始化过数据库（未包含头像字段），需要手工执行一次迁移：
+
+```sql
+ALTER TABLE sys_user ADD COLUMN avatar_file_id BIGINT NULL COMMENT 'sys_file.id (avatar)';
+```
+
 ### 配置环境变量
 
 后端通过环境变量读取 MySQL 连接信息（避免提交明文密码）：

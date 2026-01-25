@@ -12,6 +12,7 @@ CREATE TABLE sys_user (
   nickname VARCHAR(64) DEFAULT NULL,
   email VARCHAR(128) DEFAULT NULL,
   phone VARCHAR(32) DEFAULT NULL,
+  avatar_file_id BIGINT DEFAULT NULL COMMENT 'sys_file.id (avatar)',
   status TINYINT NOT NULL DEFAULT 1 COMMENT '0-disabled 1-enabled',
   deleted TINYINT NOT NULL DEFAULT 0 COMMENT '0-normal 1-deleted',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -94,4 +95,3 @@ CREATE TABLE sys_notification (
   KEY idx_sys_notification_user_created (user_id, created_at),
   KEY idx_sys_notification_user_read (user_id, is_read)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-

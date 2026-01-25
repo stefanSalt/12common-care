@@ -104,7 +104,7 @@ async function removePermission(row: PermissionDto) {
 
     <el-card>
       <el-table :data="rows" v-loading="loading" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="200" />
+        <el-table-column prop="id" label="编号" width="200" />
         <el-table-column prop="code" label="标识" width="220" />
         <el-table-column prop="name" label="名称" width="220" />
         <el-table-column prop="description" label="描述" />
