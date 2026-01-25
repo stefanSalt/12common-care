@@ -27,4 +27,4 @@
 
 - [x] `git status` 显示 clean
 - [x] `git remote -v` 正确
-- [ ] GitHub 页面可看到 main 分支与提交记录
+- [x] GitHub 页面可看到 main 分支与提交记录

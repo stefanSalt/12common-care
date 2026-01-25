@@ -79,7 +79,7 @@
   - [x] `.kiro/specs/admin-base/seed.sql` 增加 user 角色（及必要关联）
   - [x] `backend/src/test/resources/data.sql` 增加 user 角色（保证测试稳定）
 
-- [ ] 可验证性
+- [x] 可验证性
   - [x] 后端：新增集成测试（注册→登录/自动登录→改密→旧密码失败/新密码成功）
   - [x] 前端：`npm run build` 通过
-  - [ ] 手工联调 checklist：注册→登录→个人信息→改密→重新登录
+  - [x] 手工联调 checklist：注册→登录→个人信息→改密→重新登录
