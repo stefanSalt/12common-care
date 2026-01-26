@@ -29,6 +29,7 @@ function logout() {
       <div v-if="userStore.user" style="display: flex; gap: 12px; align-items: center">
         <el-avatar :size="28" :src="avatarUrl || undefined">{{ displayName?.slice(0, 1)?.toUpperCase() }}</el-avatar>
         <span>{{ displayName }}</span>
+        <el-button size="small" @click="router.push('/messages')">留言</el-button>
         <el-button size="small" @click="goProfile">个人信息</el-button>
         <el-button size="small" type="primary" plain @click="logout">退出</el-button>
       </div>

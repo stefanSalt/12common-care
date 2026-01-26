@@ -5,6 +5,7 @@ import {
   Avatar,
   ArrowDown,
   BellFilled,
+  ChatLineRound,
   Expand,
   Files,
   Fold,
@@ -30,6 +31,7 @@ const menuItems = computed<MenuItem[]>(() => [
   { label: '权限', index: '/admin/permissions', icon: Setting, permission: 'permission:list' },
   { label: '文件', index: '/admin/files', icon: Files },
   { label: '通知', index: '/admin/notifications', icon: BellFilled },
+  { label: '留言', index: '/admin/messages', icon: ChatLineRound, permission: 'message:list' },
 ])
 
 const visibleMenuItems = computed(() => {

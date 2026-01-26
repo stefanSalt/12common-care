@@ -6,10 +6,12 @@ import HomeView from '../views/home/HomeView.vue'
 import LoginView from '../views/login/LoginView.vue'
 import RegisterView from '../views/register/RegisterView.vue'
 import FilesView from '../views/admin/FilesView.vue'
+import AdminMessagesView from '../views/admin/MessagesView.vue'
 import NotificationsView from '../views/admin/NotificationsView.vue'
 import PermissionsView from '../views/admin/PermissionsView.vue'
 import RolesView from '../views/admin/RolesView.vue'
 import UsersView from '../views/admin/UsersView.vue'
+import FrontMessagesView from '../views/message/MessagesView.vue'
 import ProfileView from '../views/profile/ProfileView.vue'
 import { useUserStore } from '../stores/user'
 
@@ -66,6 +68,19 @@ const router = createRouter({
       ],
     },
     {
+      path: '/messages',
+      component: FrontendLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          name: 'front-messages',
+          component: FrontMessagesView,
+          meta: { requiresAuth: true },
+        },
+      ],
+    },
+    {
       path: '/admin',
       component: AdminLayout,
       meta: { requiresAuth: true },
@@ -105,6 +120,12 @@ const router = createRouter({
           name: 'admin-notifications',
           component: NotificationsView,
           meta: { requiresAuth: true },
+        },
+        {
+          path: 'messages',
+          name: 'admin-messages',
+          component: AdminMessagesView,
+          meta: { requiresAuth: true, permission: 'message:list' },
         },
         {
           path: 'profile',
