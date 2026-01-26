@@ -90,3 +90,18 @@ CREATE TABLE IF NOT EXISTS sys_notification (
 );
 CREATE INDEX IF NOT EXISTS idx_sys_notification_user_created ON sys_notification(user_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_sys_notification_user_read ON sys_notification(user_id, is_read);
+
+CREATE TABLE IF NOT EXISTS sys_message (
+  id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  contact_email VARCHAR(128) NOT NULL,
+  status TINYINT NOT NULL DEFAULT 0,
+  reply_content TEXT DEFAULT NULL,
+  replied_at TIMESTAMP DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+CREATE INDEX IF NOT EXISTS idx_sys_message_user_created ON sys_message(user_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_sys_message_status ON sys_message(status);

@@ -95,3 +95,18 @@ CREATE TABLE sys_notification (
   KEY idx_sys_notification_user_created (user_id, created_at),
   KEY idx_sys_notification_user_read (user_id, is_read)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE sys_message (
+  id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  contact_email VARCHAR(128) NOT NULL COMMENT 'contact email',
+  status TINYINT NOT NULL DEFAULT 0 COMMENT '0-pending 1-replied',
+  reply_content TEXT DEFAULT NULL,
+  replied_at DATETIME DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_sys_message_user_created (user_id, created_at),
+  KEY idx_sys_message_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

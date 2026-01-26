@@ -409,6 +409,15 @@ request.interceptors.response.use(
 | POST | /api/notifications/announce | 发布公告 | notification:announce |
 | WS | /ws/notification | WebSocket 连接 | 登录 |
 
+#### 留言接口
+
+| 方法 | 路径 | 描述 | 权限 |
+|------|------|------|------|
+| POST | /api/messages | 提交留言 | 登录 |
+| GET | /api/messages/my | 查询我的留言 | 登录 |
+| GET | /api/messages | 查询留言列表 | message:list |
+| PUT | /api/messages/{id}/reply | 回复留言 | message:reply |
+
 > 说明：
 > - WebSocket 连接采用 Query 参数 `token` 传递 Access Token：`/ws/notification?token=<access_token>`。
 > - 详细 HTTP 接口请求/响应 DTO 与示例见 `.kiro/specs/admin-base/api-spec.md`。
@@ -427,6 +436,7 @@ erDiagram
     PERMISSION ||--o{ ROLE_PERMISSION : has
     USER ||--o{ FILE_INFO : uploads
     USER ||--o{ NOTIFICATION : receives
+    USER ||--o{ MESSAGE : writes
 
     USER {
         bigint id PK
@@ -494,6 +504,18 @@ erDiagram
         text content
         varchar type
         tinyint is_read
+        datetime created_at
+    }
+
+    MESSAGE {
+        bigint id PK
+        bigint user_id FK
+        varchar title
+        text content
+        varchar contact_email
+        tinyint status
+        text reply_content
+        datetime replied_at
         datetime created_at
     }
 ```

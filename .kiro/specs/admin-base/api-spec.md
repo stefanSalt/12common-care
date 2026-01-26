@@ -106,6 +106,37 @@
 
 响应 `data` 为 `PageResult<T>`，字段为 `records/total/current/size`。
 
+### 3.3 留言
+
+#### CreateMessageRequest
+
+```json
+{ "title": "功能建议", "content": "希望增加……", "contactEmail": "user@example.com" }
+```
+
+#### ReplyMessageRequest
+
+```json
+{ "replyContent": "已收到，我们会在下个版本处理。" }
+```
+
+#### MessageDto
+
+```json
+{
+  "id": "9001",
+  "userId": "1",
+  "username": "alice",
+  "title": "功能建议",
+  "content": "希望增加……",
+  "contactEmail": "user@example.com",
+  "status": 0,
+  "replyContent": null,
+  "createdAt": "2026-01-26T00:00:00",
+  "repliedAt": null
+}
+```
+
 ## 4. 接口定义（HTTP）
 
 ### 4.1 认证接口
@@ -331,3 +362,25 @@
 ```
 
 - Response：`Result<Void>`
+
+### 4.7 留言（登录 / 权限）
+
+#### POST /api/messages（登录）
+
+- Request：`CreateMessageRequest`
+- Response：`Result<MessageDto>`
+
+#### GET /api/messages/my（登录）
+
+- Query：`current`、`size`
+- Response：`Result<PageResult<MessageDto>>`
+
+#### GET /api/messages（权限：message:list）
+
+- Query：`current`、`size`
+- Response：`Result<PageResult<MessageDto>>`
+
+#### PUT /api/messages/{id}/reply（权限：message:reply）
+
+- Request：`ReplyMessageRequest`
+- Response：`Result<MessageDto>`

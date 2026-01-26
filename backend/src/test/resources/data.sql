@@ -37,6 +37,9 @@ MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES 
 
 MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (130, 'notification:announce', '系统公告', '发布系统公告', 0);
 
+MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (140, 'message:list', '留言列表', '查看留言列表', 0);
+MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (141, 'message:reply', '回复留言', '回复留言', 0);
+
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2000, 10, 100);
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2001, 10, 101);
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2002, 10, 102);
@@ -53,3 +56,6 @@ MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2022
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2023, 10, 123);
 
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2030, 10, 130);
+
+MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2040, 10, 140);
+MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2041, 10, 141);
