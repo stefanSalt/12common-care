@@ -1,24 +1,46 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 import type { BannerDto } from '../../api/banner'
 import { listPublicBanners } from '../../api/banner'
+import { listPublicCrowdfundingProjects, type CrowdfundingProjectDto } from '../../api/crowdfunding'
 import type { NotificationDto } from '../../api/notification'
 import { listNotifications } from '../../api/notification'
 import { useUserStore } from '../../stores/user'
 
+const router = useRouter()
 const userStore = useUserStore()
 
 const loadingBanners = ref(false)
 const loadingAnnouncements = ref(false)
+const loadingCrowdfunding = ref(false)
 
 const banners = ref<BannerDto[]>([])
 const announcements = ref<NotificationDto[]>([])
+const latestCrowdfunding = ref<CrowdfundingProjectDto[]>([])
 
 const isLoggedIn = computed(() => !!userStore.token)
 
 function bannerImageUrl(fileId: string) {
   return fileId ? `/api/files/${fileId}/download` : ''
+}
+
+function coverUrl(fileId: string) {
+  return fileId ? `/api/files/${fileId}/download` : ''
+}
+
+function isEnded(endTime?: string) {
+  if (!endTime) return false
+  const ms = new Date(endTime).getTime()
+  return Number.isFinite(ms) ? Date.now() > ms : false
+}
+
+function percent(item: CrowdfundingProjectDto) {
+  const target = Number(item.targetAmount ?? 0)
+  const raised = Number(item.raisedAmount ?? 0)
+  if (!target || target <= 0) return 0
+  return Math.min(100, Math.round((raised / target) * 100))
 }
 
 function openLink(linkUrl?: string) {
@@ -56,11 +78,31 @@ async function loadAnnouncements() {
   }
 }
 
+async function loadCrowdfunding() {
+  loadingCrowdfunding.value = true
+  try {
+    const data = await listPublicCrowdfundingProjects(1, 6)
+    latestCrowdfunding.value = data.records ?? []
+  } catch (e: any) {
+    ElMessage.error(e?.message ?? '众筹加载失败')
+  } finally {
+    loadingCrowdfunding.value = false
+  }
+}
+
 async function load() {
-  await Promise.all([loadBanners(), loadAnnouncements()])
+  await Promise.all([loadBanners(), loadAnnouncements(), loadCrowdfunding()])
 }
 
 onMounted(load)
+
+function goCrowdfundingList() {
+  router.push('/crowdfunding')
+}
+
+function goCrowdfundingDetail(id: string) {
+  router.push(`/crowdfunding/${id}`)
+}
 </script>
 
 <template>
@@ -147,10 +189,52 @@ onMounted(load)
 
     <el-card>
       <template #header>
-        <div style="font-weight: 700">最新爱心众筹</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+          <div style="font-weight: 700">最新爱心众筹</div>
+          <el-button size="small" @click="goCrowdfundingList">查看更多</el-button>
+        </div>
       </template>
-      <div style="color: var(--el-text-color-secondary)">待开发：将展示最新众筹项目列表与捐款进度</div>
+
+      <div v-loading="loadingCrowdfunding">
+        <el-empty v-if="latestCrowdfunding.length === 0 && !loadingCrowdfunding" description="暂无众筹项目" />
+
+        <el-row v-else :gutter="12">
+          <el-col v-for="item in latestCrowdfunding" :key="item.id" :xs="24" :sm="12" :md="8">
+            <div
+              style="
+                border: 1px solid rgba(15, 23, 42, 0.08);
+                border-radius: 12px;
+                overflow: hidden;
+                background: #fff;
+                cursor: pointer;
+                margin-bottom: 12px;
+              "
+              @click="goCrowdfundingDetail(item.id)"
+            >
+              <img :src="coverUrl(item.coverFileId)" alt="cover" style="width: 100%; height: 140px; object-fit: cover" />
+              <div style="padding: 10px 12px">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px">
+                  <div style="font-weight: 800; color: #111827; line-height: 1.2; flex: 1">{{ item.title }}</div>
+                  <el-tag :type="isEnded(item.endTime) ? 'info' : 'success'" effect="light">
+                    {{ isEnded(item.endTime) ? '已结束' : '进行中' }}
+                  </el-tag>
+                </div>
+
+                <div style="margin-top: 8px; font-size: 12px; color: var(--el-text-color-secondary)">
+                  目标：{{ item.targetAmount }}｜已筹：{{ item.raisedAmount }}
+                </div>
+                <div style="margin-top: 6px; font-size: 12px; color: var(--el-text-color-secondary)">
+                  截止：{{ item.endTime }}
+                </div>
+
+                <div style="margin-top: 10px">
+                  <el-progress :percentage="percent(item)" :stroke-width="10" />
+                </div>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
     </el-card>
   </div>
 </template>
-
