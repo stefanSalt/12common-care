@@ -75,3 +75,21 @@ export async function listMyCrowdfundingDonations(current = 1, size = 10) {
   return res.data.data
 }
 
+export async function listAllCrowdfundingProjects(current = 1, size = 10) {
+  const res = await request.get<ApiResult<PageResult<CrowdfundingProjectDto>>>('/crowdfunding', {
+    params: { current, size },
+  })
+  return res.data.data
+}
+
+export async function reviewCrowdfundingProject(id: string, action: 'APPROVE' | 'REJECT') {
+  const res = await request.put<ApiResult<null>>(`/crowdfunding/${id}/review`, { action })
+  return res.data.data
+}
+
+export async function listAllCrowdfundingDonations(current = 1, size = 10, projectId?: string) {
+  const res = await request.get<ApiResult<PageResult<CrowdfundingDonationRecordDto>>>('/crowdfunding/donations', {
+    params: { current, size, projectId },
+  })
+  return res.data.data
+}

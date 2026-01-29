@@ -7,6 +7,7 @@ import {
   BellFilled,
   Calendar,
   ChatLineRound,
+  Coin,
   Expand,
   Files,
   Fold,
@@ -16,6 +17,7 @@ import {
   Setting,
   SwitchButton,
   User,
+  Wallet,
 } from '@element-plus/icons-vue'
 import { useUserStore } from '../stores/user'
 import { storage } from '../utils/storage'
@@ -34,6 +36,8 @@ const menuItems = computed<MenuItem[]>(() => [
   { label: '文件', index: '/admin/files', icon: Files },
   { label: '轮播图', index: '/admin/banners', icon: Picture, permission: 'banner:list' },
   { label: '公益活动', index: '/admin/activities', icon: Calendar, permission: 'activity:list' },
+  { label: '爱心众筹', index: '/admin/crowdfunding', icon: Coin, permission: 'crowdfunding:list' },
+  { label: '众筹捐款', index: '/admin/crowdfunding-donations', icon: Wallet, permission: 'crowdfundingDonation:list' },
   { label: '通知', index: '/admin/notifications', icon: BellFilled },
   { label: '留言', index: '/admin/messages', icon: ChatLineRound, permission: 'message:list' },
 ])
