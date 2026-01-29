@@ -2,6 +2,7 @@ package com.example.admin.controller;
 
 import com.example.admin.common.Result;
 import com.example.admin.dto.stats.ActivitySignupRatioDto;
+import com.example.admin.dto.stats.IncomeTrendDto;
 import com.example.admin.security.RequiresPermission;
 import com.example.admin.service.StatsService;
 import java.util.List;
@@ -27,5 +28,10 @@ public class StatsController {
     ) {
         return Result.ok(statsService.activitySignupRatio(days));
     }
-}
 
+    @GetMapping("/income-trend")
+    @RequiresPermission("stats:view")
+    public Result<List<IncomeTrendDto>> incomeTrend(@RequestParam(defaultValue = "7") int days) {
+        return Result.ok(statsService.incomeTrend(days));
+    }
+}

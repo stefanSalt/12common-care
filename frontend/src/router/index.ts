@@ -18,6 +18,7 @@ import MyCrowdfundingProjectsView from '../views/crowdfunding/MyCrowdfundingProj
 import FilesView from '../views/admin/FilesView.vue'
 import BannersView from '../views/admin/BannersView.vue'
 import ActivitiesView from '../views/admin/ActivitiesView.vue'
+import StatsView from '../views/admin/StatsView.vue'
 import CrowdfundingDonationsView from '../views/admin/CrowdfundingDonationsView.vue'
 import CrowdfundingProjectsView from '../views/admin/CrowdfundingProjectsView.vue'
 import AdminMessagesView from '../views/admin/MessagesView.vue'
@@ -222,6 +223,12 @@ const router = createRouter({
           name: 'admin-activities',
           component: ActivitiesView,
           meta: { requiresAuth: true, permission: 'activity:list' },
+        },
+        {
+          path: 'stats',
+          name: 'admin-stats',
+          component: StatsView,
+          meta: { requiresAuth: true, permission: 'stats:view' },
         },
         {
           path: 'crowdfunding',
