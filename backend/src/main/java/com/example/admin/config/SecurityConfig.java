@@ -90,6 +90,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/files/*/download").permitAll()
                         // Public banner list for frontend home.
                         .requestMatchers(HttpMethod.GET, "/api/banners/public").permitAll()
+                        // Public activities list/detail for frontend.
+                        .requestMatchers(HttpMethod.GET, "/api/activities/public", "/api/activities/*/public").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

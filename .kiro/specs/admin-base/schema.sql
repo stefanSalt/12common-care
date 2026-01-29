@@ -125,3 +125,65 @@ CREATE TABLE biz_banner (
   KEY idx_biz_banner_enabled_sort (enabled, sort_no),
   KEY idx_biz_banner_image_file_id (image_file_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE biz_activity (
+  id BIGINT NOT NULL,
+  title VARCHAR(128) NOT NULL,
+  cover_file_id BIGINT NOT NULL COMMENT 'sys_file.id (PUBLIC)',
+  content TEXT NOT NULL COMMENT 'HTML',
+  address VARCHAR(255) DEFAULT NULL,
+  start_time DATETIME NOT NULL,
+  end_time DATETIME NOT NULL,
+  signup_enabled TINYINT NOT NULL DEFAULT 1 COMMENT '0-disabled 1-enabled',
+  donate_enabled TINYINT NOT NULL DEFAULT 1 COMMENT '0-disabled 1-enabled',
+  max_participants INT DEFAULT NULL,
+  donation_target DECIMAL(12,2) DEFAULT NULL,
+  donated_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  enabled TINYINT NOT NULL DEFAULT 1 COMMENT '0-disabled 1-enabled',
+  deleted TINYINT NOT NULL DEFAULT 0 COMMENT '0-normal 1-deleted',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_biz_activity_enabled_time (enabled, start_time, end_time),
+  KEY idx_biz_activity_cover_file_id (cover_file_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE biz_activity_signup (
+  id BIGINT NOT NULL,
+  activity_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  status VARCHAR(16) NOT NULL COMMENT 'SIGNED/CANCELED/CHECKED_IN',
+  signed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  canceled_at DATETIME DEFAULT NULL,
+  checked_in_at DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_biz_activity_signup (activity_id, user_id),
+  KEY idx_biz_activity_signup_activity_id (activity_id),
+  KEY idx_biz_activity_signup_user_id (user_id),
+  KEY idx_biz_activity_signup_signed_at (signed_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE biz_activity_donation (
+  id BIGINT NOT NULL,
+  activity_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  remark VARCHAR(255) DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_biz_activity_donation_activity_id (activity_id),
+  KEY idx_biz_activity_donation_user_id (user_id),
+  KEY idx_biz_activity_donation_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE biz_activity_favorite (
+  id BIGINT NOT NULL,
+  activity_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_biz_activity_favorite (activity_id, user_id),
+  KEY idx_biz_activity_favorite_activity_id (activity_id),
+  KEY idx_biz_activity_favorite_user_id (user_id),
+  KEY idx_biz_activity_favorite_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -5,8 +5,14 @@ import HomeView from '../views/home/HomeView.vue'
 import FrontHomeView from '../views/home/FrontHomeView.vue'
 import LoginView from '../views/login/LoginView.vue'
 import RegisterView from '../views/register/RegisterView.vue'
+import ActivitiesListView from '../views/activity/ActivitiesListView.vue'
+import ActivityDetailView from '../views/activity/ActivityDetailView.vue'
+import MySignupsView from '../views/activity/MySignupsView.vue'
+import MyFavoritesView from '../views/activity/MyFavoritesView.vue'
+import MyDonationsView from '../views/activity/MyDonationsView.vue'
 import FilesView from '../views/admin/FilesView.vue'
 import BannersView from '../views/admin/BannersView.vue'
+import ActivitiesView from '../views/admin/ActivitiesView.vue'
 import AdminMessagesView from '../views/admin/MessagesView.vue'
 import NotificationsView from '../views/admin/NotificationsView.vue'
 import PermissionsView from '../views/admin/PermissionsView.vue'
@@ -47,6 +53,50 @@ const router = createRouter({
           name: 'front-home',
           component: FrontHomeView,
           meta: { public: true },
+        },
+      ],
+    },
+    {
+      path: '/activities',
+      component: FrontendLayout,
+      meta: { public: true },
+      children: [
+        {
+          path: '',
+          name: 'front-activities',
+          component: ActivitiesListView,
+          meta: { public: true },
+        },
+        {
+          path: ':id',
+          name: 'front-activity-detail',
+          component: ActivityDetailView,
+          meta: { public: true },
+        },
+      ],
+    },
+    {
+      path: '/my',
+      component: FrontendLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: 'signups',
+          name: 'front-my-signups',
+          component: MySignupsView,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'favorites',
+          name: 'front-my-favorites',
+          component: MyFavoritesView,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'donations',
+          name: 'front-my-donations',
+          component: MyDonationsView,
+          meta: { requiresAuth: true },
         },
       ],
     },
@@ -116,6 +166,12 @@ const router = createRouter({
           name: 'admin-banners',
           component: BannersView,
           meta: { requiresAuth: true, permission: 'banner:list' },
+        },
+        {
+          path: 'activities',
+          name: 'admin-activities',
+          component: ActivitiesView,
+          meta: { requiresAuth: true, permission: 'activity:list' },
         },
         {
           path: 'notifications',

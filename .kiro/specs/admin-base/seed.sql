@@ -51,6 +51,13 @@ INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (141, '
 INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (150, 'banner:list', '轮播图列表', '查看轮播图列表', 0);
 INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (151, 'banner:manage', '轮播图管理', '新增/编辑/删除轮播图', 0);
 
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (160, 'activity:list', '公益活动列表', '查看公益活动列表', 0);
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (161, 'activity:manage', '公益活动管理', '新增/编辑/删除公益活动', 0);
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (162, 'activitySignup:list', '活动报名记录', '查看活动报名记录', 0);
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (163, 'activityDonation:list', '活动捐赠记录', '查看活动捐赠记录', 0);
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (164, 'activityFavorite:list', '活动收藏记录', '查看活动收藏记录', 0);
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (165, 'stats:view', '数据统计', '查看统计数据', 0);
+
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2000, 10, 100);
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2001, 10, 101);
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2002, 10, 102);
@@ -73,3 +80,10 @@ INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2041, 10, 1
 
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2050, 10, 150);
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2051, 10, 151);
+
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2060, 10, 160);
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2061, 10, 161);
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2062, 10, 162);
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2063, 10, 163);
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2064, 10, 164);
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2065, 10, 165);

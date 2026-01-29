@@ -120,3 +120,65 @@ CREATE TABLE IF NOT EXISTS biz_banner (
 );
 CREATE INDEX IF NOT EXISTS idx_biz_banner_enabled_sort ON biz_banner(enabled, sort_no);
 CREATE INDEX IF NOT EXISTS idx_biz_banner_image_file_id ON biz_banner(image_file_id);
+
+CREATE TABLE IF NOT EXISTS biz_activity (
+  id BIGINT NOT NULL,
+  title VARCHAR(128) NOT NULL,
+  cover_file_id BIGINT NOT NULL,
+  content TEXT NOT NULL,
+  address VARCHAR(255) DEFAULT NULL,
+  start_time TIMESTAMP NOT NULL,
+  end_time TIMESTAMP NOT NULL,
+  signup_enabled TINYINT NOT NULL DEFAULT 1,
+  donate_enabled TINYINT NOT NULL DEFAULT 1,
+  max_participants INT DEFAULT NULL,
+  donation_target DECIMAL(12,2) DEFAULT NULL,
+  donated_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  enabled TINYINT NOT NULL DEFAULT 1,
+  deleted TINYINT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_enabled_time ON biz_activity(enabled, start_time, end_time);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_cover_file_id ON biz_activity(cover_file_id);
+
+CREATE TABLE IF NOT EXISTS biz_activity_signup (
+  id BIGINT NOT NULL,
+  activity_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  status VARCHAR(16) NOT NULL,
+  signed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  canceled_at TIMESTAMP DEFAULT NULL,
+  checked_in_at TIMESTAMP DEFAULT NULL,
+  PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_biz_activity_signup ON biz_activity_signup(activity_id, user_id);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_signup_activity_id ON biz_activity_signup(activity_id);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_signup_user_id ON biz_activity_signup(user_id);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_signup_signed_at ON biz_activity_signup(signed_at);
+
+CREATE TABLE IF NOT EXISTS biz_activity_donation (
+  id BIGINT NOT NULL,
+  activity_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  remark VARCHAR(255) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_donation_activity_id ON biz_activity_donation(activity_id);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_donation_user_id ON biz_activity_donation(user_id);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_donation_created_at ON biz_activity_donation(created_at);
+
+CREATE TABLE IF NOT EXISTS biz_activity_favorite (
+  id BIGINT NOT NULL,
+  activity_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_biz_activity_favorite ON biz_activity_favorite(activity_id, user_id);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_favorite_activity_id ON biz_activity_favorite(activity_id);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_favorite_user_id ON biz_activity_favorite(user_id);
+CREATE INDEX IF NOT EXISTS idx_biz_activity_favorite_created_at ON biz_activity_favorite(created_at);

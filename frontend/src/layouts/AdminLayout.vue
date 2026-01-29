@@ -5,6 +5,7 @@ import {
   Avatar,
   ArrowDown,
   BellFilled,
+  Calendar,
   ChatLineRound,
   Expand,
   Files,
@@ -32,6 +33,7 @@ const menuItems = computed<MenuItem[]>(() => [
   { label: '权限', index: '/admin/permissions', icon: Setting, permission: 'permission:list' },
   { label: '文件', index: '/admin/files', icon: Files },
   { label: '轮播图', index: '/admin/banners', icon: Picture, permission: 'banner:list' },
+  { label: '公益活动', index: '/admin/activities', icon: Calendar, permission: 'activity:list' },
   { label: '通知', index: '/admin/notifications', icon: BellFilled },
   { label: '留言', index: '/admin/messages', icon: ChatLineRound, permission: 'message:list' },
 ])
