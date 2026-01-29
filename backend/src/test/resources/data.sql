@@ -40,6 +40,13 @@ MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES 
 MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (140, 'message:list', '留言列表', '查看留言列表', 0);
 MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (141, 'message:reply', '回复留言', '回复留言', 0);
 
+MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (150, 'banner:list', '轮播图列表', '查看轮播图列表', 0);
+MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (151, 'banner:manage', '轮播图管理', '新增/编辑/删除轮播图', 0);
+
+-- A pre-created PUBLIC file for banner images (no physical file needed for API tests).
+MERGE INTO sys_file (id, original_name, stored_name, path, size, content_type, visibility, user_id, deleted) KEY(id)
+VALUES (5001, 'banner.png', '5001.png', '2026/01/29/5001.png', 123, 'image/png', 'PUBLIC', 1, 0);
+
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2000, 10, 100);
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2001, 10, 101);
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2002, 10, 102);
@@ -59,3 +66,6 @@ MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2030
 
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2040, 10, 140);
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2041, 10, 141);
+
+MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2050, 10, 150);
+MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2051, 10, 151);

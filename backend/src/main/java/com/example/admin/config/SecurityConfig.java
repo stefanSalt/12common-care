@@ -88,6 +88,8 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         // Public file download must allow anonymous.
                         .requestMatchers(HttpMethod.GET, "/api/files/*/download").permitAll()
+                        // Public banner list for frontend home.
+                        .requestMatchers(HttpMethod.GET, "/api/banners/public").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

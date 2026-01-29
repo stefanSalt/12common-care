@@ -11,6 +11,7 @@ import {
   Fold,
   House,
   Key,
+  Picture,
   Setting,
   SwitchButton,
   User,
@@ -30,6 +31,7 @@ const menuItems = computed<MenuItem[]>(() => [
   { label: '角色', index: '/admin/roles', icon: Key, permission: 'role:list' },
   { label: '权限', index: '/admin/permissions', icon: Setting, permission: 'permission:list' },
   { label: '文件', index: '/admin/files', icon: Files },
+  { label: '轮播图', index: '/admin/banners', icon: Picture, permission: 'banner:list' },
   { label: '通知', index: '/admin/notifications', icon: BellFilled },
   { label: '留言', index: '/admin/messages', icon: ChatLineRound, permission: 'message:list' },
 ])

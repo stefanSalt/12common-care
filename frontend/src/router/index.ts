@@ -1,11 +1,12 @@
-import { defineComponent, h } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import AdminLayout from '../layouts/AdminLayout.vue'
 import FrontendLayout from '../layouts/FrontendLayout.vue'
 import HomeView from '../views/home/HomeView.vue'
+import FrontHomeView from '../views/home/FrontHomeView.vue'
 import LoginView from '../views/login/LoginView.vue'
 import RegisterView from '../views/register/RegisterView.vue'
 import FilesView from '../views/admin/FilesView.vue'
+import BannersView from '../views/admin/BannersView.vue'
 import AdminMessagesView from '../views/admin/MessagesView.vue'
 import NotificationsView from '../views/admin/NotificationsView.vue'
 import PermissionsView from '../views/admin/PermissionsView.vue'
@@ -44,12 +45,7 @@ const router = createRouter({
         {
           path: '',
           name: 'front-home',
-          component: defineComponent({
-            name: 'FrontHomePlaceholder',
-            setup() {
-              return () => h('div', '前台占位页面')
-            },
-          }),
+          component: FrontHomeView,
           meta: { public: true },
         },
       ],
@@ -116,6 +112,12 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
         {
+          path: 'banners',
+          name: 'admin-banners',
+          component: BannersView,
+          meta: { requiresAuth: true, permission: 'banner:list' },
+        },
+        {
           path: 'notifications',
           name: 'admin-notifications',
           component: NotificationsView,
@@ -151,6 +153,13 @@ router.beforeEach((to) => {
 
   if (to.meta.requiresAuth && !userStore.token) {
     return { path: '/login', query: { redirect: to.fullPath } }
+  }
+
+  if (to.path.startsWith('/admin')) {
+    const isAdmin = (userStore.user?.roles ?? []).some((r) => r.code === 'admin')
+    if (!isAdmin) {
+      return { path: '/' }
+    }
   }
 
   return true

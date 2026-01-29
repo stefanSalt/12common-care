@@ -110,3 +110,18 @@ CREATE TABLE sys_message (
   KEY idx_sys_message_user_created (user_id, created_at),
   KEY idx_sys_message_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE biz_banner (
+  id BIGINT NOT NULL,
+  title VARCHAR(128) DEFAULT NULL,
+  image_file_id BIGINT NOT NULL COMMENT 'sys_file.id (PUBLIC)',
+  link_url VARCHAR(512) DEFAULT NULL,
+  sort_no INT NOT NULL DEFAULT 0,
+  enabled TINYINT NOT NULL DEFAULT 1 COMMENT '0-disabled 1-enabled',
+  deleted TINYINT NOT NULL DEFAULT 0 COMMENT '0-normal 1-deleted',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_biz_banner_enabled_sort (enabled, sort_no),
+  KEY idx_biz_banner_image_file_id (image_file_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

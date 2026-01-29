@@ -48,6 +48,9 @@ INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (130, '
 INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (140, 'message:list', '留言列表', '查看留言列表', 0);
 INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (141, 'message:reply', '回复留言', '回复留言', 0);
 
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (150, 'banner:list', '轮播图列表', '查看轮播图列表', 0);
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (151, 'banner:manage', '轮播图管理', '新增/编辑/删除轮播图', 0);
+
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2000, 10, 100);
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2001, 10, 101);
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2002, 10, 102);
@@ -67,3 +70,6 @@ INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2030, 10, 1
 
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2040, 10, 140);
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2041, 10, 141);
+
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2050, 10, 150);
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2051, 10, 151);

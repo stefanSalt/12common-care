@@ -13,44 +13,44 @@
 范围声明：本 Phase 只做「轮播图」模块闭环 + 前台首页展示，并补齐 /admin 路由的最小权限闸门；不提前实现众筹/活动等其它模块。
 
 ## 任务清单
-- [ ] 后端：轮播图（banners）
-- [ ] 后端：权限与种子数据
-- [ ] 前端（后台）：轮播图管理页 + 菜单
-- [ ] 前端（前台）：首页展示轮播图 + 公告（仅登录可见）
-- [ ] 前端：/admin 路由最小权限闸门
-- [ ] 测试与验证：mvn test / npm run build
+- [x] 后端：轮播图（banners）
+- [x] 后端：权限与种子数据
+- [x] 前端（后台）：轮播图管理页 + 菜单
+- [x] 前端（前台）：首页展示轮播图 + 公告（仅登录可见）
+- [x] 前端：/admin 路由最小权限闸门
+- [x] 测试与验证：mvn test / npm run build
 
 ## 1) 后端：轮播图（banners）
-- [ ] 数据库：新增表 `biz_banner`
-- [ ] Entity/Mapper：遵循 MyBatis-Plus 风格
-- [ ] Service：list/create/update/delete
-- [ ] Controller：REST（/api/banners + /api/banners/public）
-- [ ] 权限：
-  - [ ] 列表：`banner:list`
-  - [ ] 写操作：`banner:manage`
+- [x] 数据库：新增表 `biz_banner`
+- [x] Entity/Mapper：遵循 MyBatis-Plus 风格
+- [x] Service：list/create/update/delete
+- [x] Controller：REST（/api/banners + /api/banners/public）
+- [x] 权限：
+  - [x] 列表：`banner:list`
+  - [x] 写操作：`banner:manage`
 
 ## 2) 后端：权限与种子数据
-- [ ] `.kiro/specs/admin-base/schema.sql` 增加 biz_banner
-- [ ] `.kiro/specs/admin-base/seed.sql` 增加权限 + admin 角色授权
-- [ ] `backend/src/test/resources/schema.sql` + `data.sql` 同步（保证测试通过）
+- [x] `.kiro/specs/admin-base/schema.sql` 增加 biz_banner
+- [x] `.kiro/specs/admin-base/seed.sql` 增加权限 + admin 角色授权
+- [x] `backend/src/test/resources/schema.sql` + `data.sql` 同步（保证测试通过）
 
 ## 3) 前端（后台）：轮播图管理
-- [ ] 路由：`/admin/banners`
-- [ ] 菜单：AdminLayout 增加“轮播图”入口（受 v-permission 控制）
-- [ ] 页面：表格 + 新增/编辑弹窗（Element Plus）
+- [x] 路由：`/admin/banners`
+- [x] 菜单：AdminLayout 增加“轮播图”入口（受 v-permission 控制）
+- [x] 页面：表格 + 新增/编辑弹窗（Element Plus）
 
 ## 4) 前端（前台）：首页展示
-- [ ] 替换当前“前台占位页面”为真实首页（FrontendLayout 下）
-- [ ] 展示轮播图（从 /api/banners/public 拉取）
-- [ ] 公告：仅当已登录时展示（从 /api/notifications 拉取并过滤 ANNOUNCEMENT）
+- [x] 替换当前“前台占位页面”为真实首页（FrontendLayout 下）
+- [x] 展示轮播图（从 /api/banners/public 拉取）
+- [x] 公告：仅当已登录时展示（从 /api/notifications 拉取并过滤 ANNOUNCEMENT）
 
 ## 5) 前端：/admin 路由最小权限闸门
-- [ ] 路由守卫：访问 /admin/** 必须登录且具备 admin 角色
-- [ ] 未满足时：跳转到 / （或提示无权限）
+- [x] 路由守卫：访问 /admin/** 必须登录且具备 admin 角色
+- [x] 未满足时：跳转到 / （或提示无权限）
 
 ## 6) 验证
-- [ ] 后端：`cd backend && mvn test`
-- [ ] 前端：`cd frontend && npm run build`
+- [x] 后端：`cd backend && mvn test`
+- [x] 前端：`cd frontend && npm run build`
 
 完成标准：
 - 管理员可在后台维护轮播图；普通用户在首页可看到轮播图；公告仅登录可见；/admin 路由不会被普通用户直接打开。

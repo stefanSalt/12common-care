@@ -384,3 +384,36 @@
 
 - Request：`ReplyMessageRequest`
 - Response：`Result<MessageDto>`
+
+### 4.8 轮播图（公开 / 权限）
+
+#### GET /api/banners/public（公开）
+
+- 用途：前台首页展示轮播图（仅返回 enabled=1 的数据，按 sortNo desc 排序）。
+- Query：`current`、`size`
+- Response：`Result<PageResult<BannerDto>>`
+
+#### GET /api/banners（权限：banner:list）
+
+- Query：`current`、`size`
+- Response：`Result<PageResult<BannerDto>>`（包含 enabled=0 的数据）
+
+#### POST /api/banners（权限：banner:manage）
+
+```json
+{ "title": "首页轮播 1", "imageFileId": 5001, "linkUrl": "https://example.com", "sortNo": 10, "enabled": 1 }
+```
+
+- Response：`Result<BannerDto>`
+
+#### PUT /api/banners/{id}（权限：banner:manage）
+
+```json
+{ "title": "首页轮播 1（更新）", "enabled": 0 }
+```
+
+- Response：`Result<BannerDto>`
+
+#### DELETE /api/banners/{id}（权限：banner:manage）
+
+- Response：`Result<Void>`

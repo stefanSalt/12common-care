@@ -105,3 +105,18 @@ CREATE TABLE IF NOT EXISTS sys_message (
 );
 CREATE INDEX IF NOT EXISTS idx_sys_message_user_created ON sys_message(user_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_sys_message_status ON sys_message(status);
+
+CREATE TABLE IF NOT EXISTS biz_banner (
+  id BIGINT NOT NULL,
+  title VARCHAR(128) DEFAULT NULL,
+  image_file_id BIGINT NOT NULL,
+  link_url VARCHAR(512) DEFAULT NULL,
+  sort_no INT NOT NULL DEFAULT 0,
+  enabled TINYINT NOT NULL DEFAULT 1,
+  deleted TINYINT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+CREATE INDEX IF NOT EXISTS idx_biz_banner_enabled_sort ON biz_banner(enabled, sort_no);
+CREATE INDEX IF NOT EXISTS idx_biz_banner_image_file_id ON biz_banner(image_file_id);
