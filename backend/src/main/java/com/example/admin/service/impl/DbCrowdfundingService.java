@@ -209,6 +209,38 @@ public class DbCrowdfundingService implements CrowdfundingService {
     }
 
     @Override
+    public PageResult<CrowdfundingProjectDto> listMyProjects(Long userId, long current, long size) {
+        if (userId == null) {
+            throw new AuthenticationCredentialsNotFoundException("未登录");
+        }
+        Page<BizCrowdfundingProject> page = projectMapper.selectPage(
+                new Page<>(current, size),
+                Wrappers.lambdaQuery(BizCrowdfundingProject.class)
+                        .eq(BizCrowdfundingProject::getCreatedBy, userId)
+                        .orderByDesc(BizCrowdfundingProject::getId)
+        );
+        return toPageResult(page.getRecords(), page);
+    }
+
+    @Override
+    public CrowdfundingProjectDetailDto getMyDetail(Long userId, Long id) {
+        if (userId == null) {
+            throw new AuthenticationCredentialsNotFoundException("未登录");
+        }
+        if (id == null) {
+            throw new BusinessException(400, "id不能为空");
+        }
+        BizCrowdfundingProject project = projectMapper.selectById(id);
+        if (project == null) {
+            throw new BusinessException(404, "众筹项目不存在");
+        }
+        if (project.getCreatedBy() == null || !project.getCreatedBy().equals(userId)) {
+            throw new BusinessException(403, "无权查看该众筹项目");
+        }
+        return toDetailDto(project);
+    }
+
+    @Override
     @Transactional
     public CrowdfundingProjectDto create(Long userId, CreateCrowdfundingProjectRequest request) {
         if (userId == null) {

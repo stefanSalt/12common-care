@@ -39,6 +39,9 @@ class CrowdfundingModuleTest {
         createUser(adminToken, "alice_cf", "alice123");
         String aliceToken = login("alice_cf", "alice123");
 
+        createUser(adminToken, "bob_cf", "bob123");
+        String bobToken = login("bob_cf", "bob123");
+
         // Alice creates a project (PENDING).
         String projectId = createProject(
                 aliceToken,
@@ -46,6 +49,16 @@ class CrowdfundingModuleTest {
                 LocalDateTime.now().plusDays(2).withNano(0),
                 100
         );
+
+        // My projects list/detail (owner only).
+        JsonNode myProjects0 = listMyProjects(aliceToken, 1, 50);
+        Assertions.assertTrue(containsTitle(myProjects0, "p1"));
+        Assertions.assertEquals("p1", myDetail(aliceToken, projectId).at("/data/title").asText());
+
+        mockMvc.perform(get("/api/crowdfunding/" + projectId + "/my")
+                        .header("Authorization", "Bearer " + bobToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(403));
 
         // Public list should not include pending projects.
         JsonNode publicList = listPublic(1, 50);
@@ -66,6 +79,8 @@ class CrowdfundingModuleTest {
         adminUpdateProject(adminToken, projectId, "p1_admin", 120, LocalDateTime.now().plusDays(3).withNano(0), 1);
         publicList = listPublic(1, 50);
         Assertions.assertTrue(containsTitle(publicList, "p1_admin"));
+        JsonNode myProjects1 = listMyProjects(aliceToken, 1, 50);
+        Assertions.assertTrue(containsTitle(myProjects1, "p1_admin"));
 
         // Disabled projects should not be visible publicly and cannot accept donations.
         adminUpdateProjectEnabled(adminToken, projectId, 0);
@@ -187,6 +202,26 @@ class CrowdfundingModuleTest {
         MvcResult result = mockMvc.perform(get("/api/crowdfunding/public")
                         .param("current", String.valueOf(current))
                         .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andReturn();
+        return objectMapper.readTree(result.getResponse().getContentAsString());
+    }
+
+    private JsonNode listMyProjects(String token, int current, int size) throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/crowdfunding/my/projects")
+                        .header("Authorization", "Bearer " + token)
+                        .param("current", String.valueOf(current))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andReturn();
+        return objectMapper.readTree(result.getResponse().getContentAsString());
+    }
+
+    private JsonNode myDetail(String token, String id) throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/crowdfunding/" + id + "/my")
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
                 .andReturn();

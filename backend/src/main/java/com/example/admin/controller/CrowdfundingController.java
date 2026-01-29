@@ -157,4 +157,23 @@ public class CrowdfundingController {
     ) {
         return Result.ok(crowdfundingService.listAllDonations(current, size, projectId));
     }
+
+    @GetMapping("/my/projects")
+    public Result<PageResult<CrowdfundingProjectDto>> myProjects(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam(defaultValue = "1") long current,
+            @RequestParam(defaultValue = "10") long size
+    ) {
+        Long userId = principal == null ? null : principal.userId();
+        return Result.ok(crowdfundingService.listMyProjects(userId, current, size));
+    }
+
+    @GetMapping("/{id}/my")
+    public Result<CrowdfundingProjectDetailDto> myDetail(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id
+    ) {
+        Long userId = principal == null ? null : principal.userId();
+        return Result.ok(crowdfundingService.getMyDetail(userId, id));
+    }
 }

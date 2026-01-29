@@ -11,8 +11,10 @@ import MySignupsView from '../views/activity/MySignupsView.vue'
 import MyFavoritesView from '../views/activity/MyFavoritesView.vue'
 import MyDonationsView from '../views/activity/MyDonationsView.vue'
 import CrowdfundingListView from '../views/crowdfunding/CrowdfundingListView.vue'
+import CrowdfundingCreateView from '../views/crowdfunding/CrowdfundingCreateView.vue'
 import CrowdfundingDetailView from '../views/crowdfunding/CrowdfundingDetailView.vue'
 import MyCrowdfundingDonationsView from '../views/crowdfunding/MyCrowdfundingDonationsView.vue'
+import MyCrowdfundingProjectsView from '../views/crowdfunding/MyCrowdfundingProjectsView.vue'
 import FilesView from '../views/admin/FilesView.vue'
 import BannersView from '../views/admin/BannersView.vue'
 import ActivitiesView from '../views/admin/ActivitiesView.vue'
@@ -92,6 +94,18 @@ const router = createRouter({
           meta: { public: true },
         },
         {
+          path: 'new',
+          name: 'front-crowdfunding-new',
+          component: CrowdfundingCreateView,
+          meta: { requiresAuth: true, public: false },
+        },
+        {
+          path: 'edit/:id',
+          name: 'front-crowdfunding-edit',
+          component: CrowdfundingCreateView,
+          meta: { requiresAuth: true, public: false },
+        },
+        {
           path: ':id',
           name: 'front-crowdfunding-detail',
           component: CrowdfundingDetailView,
@@ -126,6 +140,12 @@ const router = createRouter({
           path: 'crowdfunding-donations',
           name: 'front-my-crowdfunding-donations',
           component: MyCrowdfundingDonationsView,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'crowdfunding-projects',
+          name: 'front-my-crowdfunding-projects',
+          component: MyCrowdfundingProjectsView,
           meta: { requiresAuth: true },
         },
       ],

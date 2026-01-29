@@ -25,6 +25,10 @@ public interface CrowdfundingService {
 
     void delete(Long adminUserId, Long id);
 
+    PageResult<CrowdfundingProjectDto> listMyProjects(Long userId, long current, long size);
+
+    CrowdfundingProjectDetailDto getMyDetail(Long userId, Long id);
+
     CrowdfundingProjectDto create(Long userId, CreateCrowdfundingProjectRequest request);
 
     CrowdfundingProjectDto update(Long userId, Long id, UpdateCrowdfundingProjectRequest request);

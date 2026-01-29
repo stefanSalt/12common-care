@@ -38,6 +38,22 @@ export type CreateCrowdfundingDonationRequest = {
   remark?: string
 }
 
+export type CreateCrowdfundingProjectRequest = {
+  title: string
+  coverFileId: LongLike
+  content: string
+  targetAmount: number
+  endTime: string
+}
+
+export type UpdateCrowdfundingProjectRequest = {
+  title?: string
+  coverFileId?: LongLike
+  content?: string
+  targetAmount?: number
+  endTime?: string
+}
+
 export type CrowdfundingDonationRecordDto = {
   id: string
   projectId: string
@@ -81,6 +97,33 @@ export async function listMyCrowdfundingDonations(current = 1, size = 10) {
   const res = await request.get<ApiResult<PageResult<CrowdfundingDonationRecordDto>>>('/crowdfunding/my/donations', {
     params: { current, size },
   })
+  return res.data.data
+}
+
+export async function createCrowdfundingProject(payload: CreateCrowdfundingProjectRequest) {
+  const res = await request.post<ApiResult<CrowdfundingProjectDto>>('/crowdfunding', payload)
+  return res.data.data
+}
+
+export async function updateCrowdfundingProject(id: string, payload: UpdateCrowdfundingProjectRequest) {
+  const res = await request.put<ApiResult<CrowdfundingProjectDto>>(`/crowdfunding/${id}`, payload)
+  return res.data.data
+}
+
+export async function submitCrowdfundingProject(id: string) {
+  const res = await request.put<ApiResult<null>>(`/crowdfunding/${id}/submit`)
+  return res.data.data
+}
+
+export async function listMyCrowdfundingProjects(current = 1, size = 10) {
+  const res = await request.get<ApiResult<PageResult<CrowdfundingProjectDto>>>('/crowdfunding/my/projects', {
+    params: { current, size },
+  })
+  return res.data.data
+}
+
+export async function getMyCrowdfundingProjectDetail(id: string) {
+  const res = await request.get<ApiResult<CrowdfundingProjectDetailDto>>(`/crowdfunding/${id}/my`)
   return res.data.data
 }
 

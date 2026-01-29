@@ -55,6 +55,14 @@ function goMyCrowdfundingDonations() {
   router.push('/my/crowdfunding-donations')
 }
 
+function goMyCrowdfundingProjects() {
+  router.push('/my/crowdfunding-projects')
+}
+
+function goCrowdfundingNew() {
+  router.push('/crowdfunding/new')
+}
+
 function goProfile() {
   router.push('/profile')
 }
@@ -113,6 +121,8 @@ function logout() {
                   <el-dropdown-item @click="goMyFavorites">我的收藏</el-dropdown-item>
                   <el-dropdown-item @click="goMyDonations">我的捐赠</el-dropdown-item>
                   <el-dropdown-item @click="goMyCrowdfundingDonations">众筹捐款</el-dropdown-item>
+                  <el-dropdown-item @click="goMyCrowdfundingProjects">我的众筹</el-dropdown-item>
+                  <el-dropdown-item @click="goCrowdfundingNew">发起众筹</el-dropdown-item>
                   <el-dropdown-item @click="goMessages">我的留言</el-dropdown-item>
                   <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
