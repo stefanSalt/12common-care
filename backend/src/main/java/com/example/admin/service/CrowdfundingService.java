@@ -4,6 +4,7 @@ import com.example.admin.common.PageResult;
 import com.example.admin.dto.crowdfunding.CreateCrowdfundingDonationRequest;
 import com.example.admin.dto.crowdfunding.CreateCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.CrowdfundingDonationDto;
+import com.example.admin.dto.crowdfunding.CrowdfundingDonationRecordDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingProjectDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingPublicDetailDto;
 import com.example.admin.dto.crowdfunding.ReviewCrowdfundingProjectRequest;
@@ -25,5 +26,8 @@ public interface CrowdfundingService {
     void review(Long adminUserId, Long id, ReviewCrowdfundingProjectRequest request);
 
     CrowdfundingDonationDto donate(Long userId, Long projectId, CreateCrowdfundingDonationRequest request);
-}
 
+    PageResult<CrowdfundingDonationRecordDto> listMyDonations(Long userId, long current, long size);
+
+    PageResult<CrowdfundingDonationRecordDto> listAllDonations(long current, long size, Long projectId);
+}

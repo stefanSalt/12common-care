@@ -77,6 +77,17 @@ class CrowdfundingModuleTest {
         String d1Name = detail1.at("/data/latestDonations/1/donorName").asText();
         Assertions.assertTrue(d0Name.equals("匿名") || d1Name.equals("匿名"), "d0Name=" + d0Name + ", d1Name=" + d1Name);
 
+        // My donation records should include both donations.
+        JsonNode myDonations = listMyDonations(aliceToken, 1, 50);
+        Assertions.assertEquals(2, myDonations.at("/data/records").size());
+        Assertions.assertEquals("p1", myDonations.at("/data/records/0/projectTitle").asText());
+
+        // Admin donation records should include anonymous flag and username.
+        JsonNode adminDonations = listAllDonations(adminToken, 1, 50, projectId);
+        Assertions.assertEquals(2, adminDonations.at("/data/records").size());
+        Assertions.assertEquals(1, adminDonations.at("/data/records/0/isAnonymous").asInt());
+        Assertions.assertEquals("alice_cf", adminDonations.at("/data/records/0/username").asText());
+
         // Ended projects forbid donating (even if approved).
         String endedProjectId = createProject(
                 aliceToken,
@@ -130,6 +141,29 @@ class CrowdfundingModuleTest {
 
     private JsonNode publicDetail(String id) throws Exception {
         MvcResult result = mockMvc.perform(get("/api/crowdfunding/" + id + "/public"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andReturn();
+        return objectMapper.readTree(result.getResponse().getContentAsString());
+    }
+
+    private JsonNode listMyDonations(String token, int current, int size) throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/crowdfunding/my/donations")
+                        .header("Authorization", "Bearer " + token)
+                        .param("current", String.valueOf(current))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andReturn();
+        return objectMapper.readTree(result.getResponse().getContentAsString());
+    }
+
+    private JsonNode listAllDonations(String token, int current, int size, String projectId) throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/crowdfunding/donations")
+                        .header("Authorization", "Bearer " + token)
+                        .param("current", String.valueOf(current))
+                        .param("size", String.valueOf(size))
+                        .param("projectId", projectId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
                 .andReturn();

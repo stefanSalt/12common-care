@@ -6,6 +6,7 @@ import com.example.admin.common.PageResult;
 import com.example.admin.dto.crowdfunding.CreateCrowdfundingDonationRequest;
 import com.example.admin.dto.crowdfunding.CreateCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.CrowdfundingDonationDto;
+import com.example.admin.dto.crowdfunding.CrowdfundingDonationRecordDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingProjectDetailDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingProjectDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingPublicDetailDto;
@@ -344,6 +345,33 @@ public class DbCrowdfundingService implements CrowdfundingService {
         return dto;
     }
 
+    @Override
+    public PageResult<CrowdfundingDonationRecordDto> listMyDonations(Long userId, long current, long size) {
+        if (userId == null) {
+            throw new AuthenticationCredentialsNotFoundException("未登录");
+        }
+        Page<BizCrowdfundingDonation> page = donationMapper.selectPage(
+                new Page<>(current, size),
+                Wrappers.lambdaQuery(BizCrowdfundingDonation.class)
+                        .eq(BizCrowdfundingDonation::getUserId, userId)
+                        .orderByDesc(BizCrowdfundingDonation::getCreatedAt)
+                        .orderByDesc(BizCrowdfundingDonation::getId)
+        );
+        return toDonationRecordPageResult(page.getRecords(), page, true);
+    }
+
+    @Override
+    public PageResult<CrowdfundingDonationRecordDto> listAllDonations(long current, long size, Long projectId) {
+        Page<BizCrowdfundingDonation> page = donationMapper.selectPage(
+                new Page<>(current, size),
+                Wrappers.lambdaQuery(BizCrowdfundingDonation.class)
+                        .eq(projectId != null, BizCrowdfundingDonation::getProjectId, projectId)
+                        .orderByDesc(BizCrowdfundingDonation::getCreatedAt)
+                        .orderByDesc(BizCrowdfundingDonation::getId)
+        );
+        return toDonationRecordPageResult(page.getRecords(), page, false);
+    }
+
     private PageResult<CrowdfundingProjectDto> toPageResult(List<BizCrowdfundingProject> records, Page<?> page) {
         List<CrowdfundingProjectDto> dtos = records.stream().map(this::toDto).toList();
         PageResult<CrowdfundingProjectDto> result = new PageResult<>();
@@ -393,6 +421,56 @@ public class DbCrowdfundingService implements CrowdfundingService {
         return dto;
     }
 
+    private PageResult<CrowdfundingDonationRecordDto> toDonationRecordPageResult(
+            List<BizCrowdfundingDonation> records,
+            Page<?> page,
+            boolean forMy
+    ) {
+        Map<Long, BizCrowdfundingProject> projects = loadProjects(
+                records.stream().map(BizCrowdfundingDonation::getProjectId).toList()
+        );
+        Map<Long, SysUser> users = forMy
+                ? Map.of()
+                : loadUsers(records.stream().map(BizCrowdfundingDonation::getUserId).toList());
+
+        List<CrowdfundingDonationRecordDto> dtos = records.stream()
+                .map(r -> toDonationRecordDto(r, projects.get(r.getProjectId()), users.get(r.getUserId())))
+                .toList();
+
+        PageResult<CrowdfundingDonationRecordDto> result = new PageResult<>();
+        result.setRecords(dtos);
+        result.setTotal(page.getTotal());
+        result.setCurrent(page.getCurrent());
+        result.setSize(page.getSize());
+        return result;
+    }
+
+    private CrowdfundingDonationRecordDto toDonationRecordDto(
+            BizCrowdfundingDonation donation,
+            BizCrowdfundingProject project,
+            SysUser user
+    ) {
+        if (donation == null) {
+            return null;
+        }
+        CrowdfundingDonationRecordDto dto = new CrowdfundingDonationRecordDto();
+        dto.setId(donation.getId());
+        dto.setProjectId(donation.getProjectId());
+        dto.setUserId(donation.getUserId());
+        dto.setAmount(donation.getAmount());
+        dto.setIsAnonymous(donation.getIsAnonymous());
+        dto.setRemark(donation.getRemark());
+        dto.setCreatedAt(donation.getCreatedAt());
+        if (project != null) {
+            dto.setProjectTitle(project.getTitle());
+            dto.setProjectCoverFileId(project.getCoverFileId());
+        }
+        if (user != null) {
+            dto.setUsername(user.getUsername());
+        }
+        return dto;
+    }
+
     private CrowdfundingDonationDto toDonationDto(BizCrowdfundingDonation donation, Map<Long, SysUser> userCache) {
         if (donation == null) {
             return null;
@@ -409,6 +487,32 @@ public class DbCrowdfundingService implements CrowdfundingService {
             dto.setDonorName(resolveDonorName(donation.getUserId(), userCache));
         }
         return dto;
+    }
+
+    private Map<Long, BizCrowdfundingProject> loadProjects(List<Long> projectIds) {
+        if (projectIds == null || projectIds.isEmpty()) {
+            return Map.of();
+        }
+        List<Long> ids = projectIds.stream().distinct().toList();
+        List<BizCrowdfundingProject> list = projectMapper.selectBatchIds(ids);
+        Map<Long, BizCrowdfundingProject> map = new HashMap<>();
+        for (BizCrowdfundingProject p : list) {
+            map.put(p.getId(), p);
+        }
+        return map;
+    }
+
+    private Map<Long, SysUser> loadUsers(List<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Map.of();
+        }
+        List<Long> ids = userIds.stream().distinct().toList();
+        List<SysUser> list = userMapper.selectBatchIds(ids);
+        Map<Long, SysUser> map = new HashMap<>();
+        for (SysUser u : list) {
+            map.put(u.getId(), u);
+        }
+        return map;
     }
 
     private String resolveDonorName(Long userId, Map<Long, SysUser> cache) {
@@ -492,4 +596,3 @@ public class DbCrowdfundingService implements CrowdfundingService {
         return t;
     }
 }
-

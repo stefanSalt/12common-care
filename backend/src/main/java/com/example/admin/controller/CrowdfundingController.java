@@ -5,6 +5,7 @@ import com.example.admin.common.Result;
 import com.example.admin.dto.crowdfunding.CreateCrowdfundingDonationRequest;
 import com.example.admin.dto.crowdfunding.CreateCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.CrowdfundingDonationDto;
+import com.example.admin.dto.crowdfunding.CrowdfundingDonationRecordDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingProjectDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingPublicDetailDto;
 import com.example.admin.dto.crowdfunding.ReviewCrowdfundingProjectRequest;
@@ -105,5 +106,24 @@ public class CrowdfundingController {
         Long userId = principal == null ? null : principal.userId();
         return Result.ok(crowdfundingService.donate(userId, id, request));
     }
-}
 
+    @GetMapping("/my/donations")
+    public Result<PageResult<CrowdfundingDonationRecordDto>> myDonations(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam(defaultValue = "1") long current,
+            @RequestParam(defaultValue = "10") long size
+    ) {
+        Long userId = principal == null ? null : principal.userId();
+        return Result.ok(crowdfundingService.listMyDonations(userId, current, size));
+    }
+
+    @GetMapping("/donations")
+    @RequiresPermission("crowdfundingDonation:list")
+    public Result<PageResult<CrowdfundingDonationRecordDto>> listDonations(
+            @RequestParam(defaultValue = "1") long current,
+            @RequestParam(defaultValue = "10") long size,
+            @RequestParam(required = false) Long projectId
+    ) {
+        return Result.ok(crowdfundingService.listAllDonations(current, size, projectId));
+    }
+}
