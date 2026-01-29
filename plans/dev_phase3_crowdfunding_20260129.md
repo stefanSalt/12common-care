@@ -32,7 +32,7 @@
 - [x] 前端（前台）：众筹列表/详情 + 捐款 + 我的捐款
 - [ ] 前端（前台首页）：展示“最新众筹”（与轮播图/公告同页）
 - [ ] 前端（后台）：众筹审核/管理 + 捐款记录管理
-- [ ] 测试与验证：mvn test / npm run build（已完成：后端 mvn test、前端 npm run build）
+- [x] 测试与验证：mvn test / npm run build（已完成：后端 mvn test、前端 npm run build）
 
 ## 数据表建议（最小可用）
 - `biz_crowdfunding_project`：
