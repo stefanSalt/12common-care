@@ -1,5 +1,5 @@
 import request, { type ApiResult } from '../utils/request'
-import type { PageResult } from './types'
+import type { LongLike, PageResult } from './types'
 
 export type CrowdfundingProjectDto = {
   id: string
@@ -51,6 +51,15 @@ export type CrowdfundingDonationRecordDto = {
   username?: string
 }
 
+export type ManageCrowdfundingProjectRequest = {
+  title?: string
+  coverFileId?: LongLike
+  content?: string
+  targetAmount?: number
+  endTime?: string
+  enabled?: number
+}
+
 export async function listPublicCrowdfundingProjects(current = 1, size = 10) {
   const res = await request.get<ApiResult<PageResult<CrowdfundingProjectDto>>>('/crowdfunding/public', {
     params: { current, size },
@@ -82,8 +91,23 @@ export async function listAllCrowdfundingProjects(current = 1, size = 10) {
   return res.data.data
 }
 
+export async function getCrowdfundingProjectDetail(id: string) {
+  const res = await request.get<ApiResult<CrowdfundingProjectDetailDto>>(`/crowdfunding/${id}`)
+  return res.data.data
+}
+
 export async function reviewCrowdfundingProject(id: string, action: 'APPROVE' | 'REJECT') {
   const res = await request.put<ApiResult<null>>(`/crowdfunding/${id}/review`, { action })
+  return res.data.data
+}
+
+export async function manageUpdateCrowdfundingProject(id: string, payload: ManageCrowdfundingProjectRequest) {
+  const res = await request.put<ApiResult<CrowdfundingProjectDetailDto>>(`/crowdfunding/${id}/manage`, payload)
+  return res.data.data
+}
+
+export async function deleteCrowdfundingProject(id: string) {
+  const res = await request.delete<ApiResult<null>>(`/crowdfunding/${id}`)
   return res.data.data
 }
 

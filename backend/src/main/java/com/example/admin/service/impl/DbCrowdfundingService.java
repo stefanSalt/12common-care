@@ -10,6 +10,7 @@ import com.example.admin.dto.crowdfunding.CrowdfundingDonationRecordDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingProjectDetailDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingProjectDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingPublicDetailDto;
+import com.example.admin.dto.crowdfunding.ManageCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.ReviewCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.UpdateCrowdfundingProjectRequest;
 import com.example.admin.entity.BizCrowdfundingDonation;
@@ -114,6 +115,97 @@ public class DbCrowdfundingService implements CrowdfundingService {
                         .orderByDesc(BizCrowdfundingProject::getId)
         );
         return toPageResult(page.getRecords(), page);
+    }
+
+    @Override
+    public CrowdfundingProjectDetailDto getDetail(Long id) {
+        if (id == null) {
+            throw new BusinessException(400, "id不能为空");
+        }
+        BizCrowdfundingProject project = projectMapper.selectById(id);
+        if (project == null) {
+            throw new BusinessException(404, "众筹项目不存在");
+        }
+        return toDetailDto(project);
+    }
+
+    @Override
+    @Transactional
+    public CrowdfundingProjectDetailDto manageUpdate(Long adminUserId, Long id, ManageCrowdfundingProjectRequest request) {
+        if (adminUserId == null) {
+            throw new AuthenticationCredentialsNotFoundException("未登录");
+        }
+        if (id == null) {
+            throw new BusinessException(400, "id不能为空");
+        }
+        if (request == null) {
+            throw new BusinessException(400, "请求不能为空");
+        }
+
+        BizCrowdfundingProject existing = projectMapper.selectById(id);
+        if (existing == null) {
+            throw new BusinessException(404, "众筹项目不存在");
+        }
+
+        BizCrowdfundingProject update = new BizCrowdfundingProject();
+        update.setId(id);
+
+        if (request.getTitle() != null) {
+            update.setTitle(requireTrimmed(request.getTitle(), "title不能为空"));
+        }
+        if (request.getCoverFileId() != null) {
+            validatePublicFile(request.getCoverFileId(), "coverFileId不能为空");
+            update.setCoverFileId(request.getCoverFileId());
+        }
+        if (request.getContent() != null) {
+            String content = requireTrimmed(request.getContent(), "content不能为空");
+            validatePublicImagesInHtml(content);
+            update.setContent(content);
+        }
+        if (request.getTargetAmount() != null) {
+            BigDecimal ta = request.getTargetAmount();
+            if (ta.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new BusinessException(400, "targetAmount必须大于0");
+            }
+            update.setTargetAmount(ta);
+        }
+        if (request.getEndTime() != null) {
+            update.setEndTime(request.getEndTime().withNano(0));
+        }
+        if (request.getEnabled() != null) {
+            update.setEnabled(normalizeEnabledFlag(request.getEnabled()));
+        }
+
+        projectMapper.updateById(update);
+
+        BizCrowdfundingProject latest = projectMapper.selectById(id);
+        return toDetailDto(latest);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long adminUserId, Long id) {
+        if (adminUserId == null) {
+            throw new AuthenticationCredentialsNotFoundException("未登录");
+        }
+        if (id == null) {
+            throw new BusinessException(400, "id不能为空");
+        }
+
+        BizCrowdfundingProject existing = projectMapper.selectById(id);
+        if (existing == null) {
+            throw new BusinessException(404, "众筹项目不存在");
+        }
+
+        Long donationCount = donationMapper.selectCount(
+                Wrappers.lambdaQuery(BizCrowdfundingDonation.class)
+                        .eq(BizCrowdfundingDonation::getProjectId, id)
+        );
+        if (donationCount != null && donationCount > 0) {
+            throw new BusinessException(400, "该项目已有捐款记录，禁止删除，请先禁用");
+        }
+
+        projectMapper.deleteById(id);
     }
 
     @Override

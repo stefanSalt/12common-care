@@ -1,5 +1,6 @@
 package com.example.admin.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -61,6 +62,30 @@ class CrowdfundingModuleTest {
         publicList = listPublic(1, 50);
         Assertions.assertTrue(containsTitle(publicList, "p1"));
 
+        // Admin can edit approved projects (should not change status).
+        adminUpdateProject(adminToken, projectId, "p1_admin", 120, LocalDateTime.now().plusDays(3).withNano(0), 1);
+        publicList = listPublic(1, 50);
+        Assertions.assertTrue(containsTitle(publicList, "p1_admin"));
+
+        // Disabled projects should not be visible publicly and cannot accept donations.
+        adminUpdateProjectEnabled(adminToken, projectId, 0);
+        publicList = listPublic(1, 50);
+        Assertions.assertFalse(containsTitle(publicList, "p1_admin"));
+
+        mockMvc.perform(get("/api/crowdfunding/" + projectId + "/public"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(404));
+
+        mockMvc.perform(post("/api/crowdfunding/" + projectId + "/donations")
+                        .header("Authorization", "Bearer " + aliceToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"amount\":1,\"anonymous\":false}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(404));
+
+        // Re-enable.
+        adminUpdateProjectEnabled(adminToken, projectId, 1);
+
         // Public detail donations initially empty.
         JsonNode detail0 = publicDetail(projectId);
         Assertions.assertEquals(0, detail0.at("/data/latestDonations").size());
@@ -80,13 +105,42 @@ class CrowdfundingModuleTest {
         // My donation records should include both donations.
         JsonNode myDonations = listMyDonations(aliceToken, 1, 50);
         Assertions.assertEquals(2, myDonations.at("/data/records").size());
-        Assertions.assertEquals("p1", myDonations.at("/data/records/0/projectTitle").asText());
+        Assertions.assertEquals("p1_admin", myDonations.at("/data/records/0/projectTitle").asText());
 
         // Admin donation records should include anonymous flag and username.
         JsonNode adminDonations = listAllDonations(adminToken, 1, 50, projectId);
         Assertions.assertEquals(2, adminDonations.at("/data/records").size());
-        Assertions.assertEquals(1, adminDonations.at("/data/records/0/isAnonymous").asInt());
-        Assertions.assertEquals("alice_cf", adminDonations.at("/data/records/0/username").asText());
+        boolean hasAnonymous = false;
+        for (JsonNode item : adminDonations.at("/data/records")) {
+            if (item.at("/isAnonymous").asInt() == 1) {
+                hasAnonymous = true;
+            }
+            Assertions.assertEquals("alice_cf", item.at("/username").asText());
+        }
+        Assertions.assertTrue(hasAnonymous, "should include an anonymous donation record");
+
+        // Projects with donations cannot be deleted (should disable instead).
+        mockMvc.perform(delete("/api/crowdfunding/" + projectId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400));
+
+        // Projects without donations can be deleted.
+        String deletableProjectId = createProject(
+                aliceToken,
+                "p_del",
+                LocalDateTime.now().plusDays(2).withNano(0),
+                100
+        );
+        adminDetail(adminToken, deletableProjectId);
+        mockMvc.perform(delete("/api/crowdfunding/" + deletableProjectId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+        mockMvc.perform(get("/api/crowdfunding/" + deletableProjectId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(404));
 
         // Ended projects forbid donating (even if approved).
         String endedProjectId = createProject(
@@ -133,6 +187,15 @@ class CrowdfundingModuleTest {
         MvcResult result = mockMvc.perform(get("/api/crowdfunding/public")
                         .param("current", String.valueOf(current))
                         .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andReturn();
+        return objectMapper.readTree(result.getResponse().getContentAsString());
+    }
+
+    private JsonNode adminDetail(String token, String id) throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/crowdfunding/" + id)
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
                 .andReturn();
@@ -198,6 +261,38 @@ class CrowdfundingModuleTest {
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"" + newTitle + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+    }
+
+    private void adminUpdateProject(
+            String token,
+            String projectId,
+            String title,
+            int targetAmount,
+            LocalDateTime endTime,
+            int enabled
+    ) throws Exception {
+        String et = endTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        String payload = "{"
+                + "\"title\":\"" + title + "\","
+                + "\"targetAmount\":" + targetAmount + ","
+                + "\"endTime\":\"" + et + "\","
+                + "\"enabled\":" + enabled
+                + "}";
+        mockMvc.perform(put("/api/crowdfunding/" + projectId + "/manage")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+    }
+
+    private void adminUpdateProjectEnabled(String token, String projectId, int enabled) throws Exception {
+        mockMvc.perform(put("/api/crowdfunding/" + projectId + "/manage")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"enabled\":" + enabled + "}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0));
     }

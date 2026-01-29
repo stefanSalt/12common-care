@@ -6,14 +6,17 @@ import com.example.admin.dto.crowdfunding.CreateCrowdfundingDonationRequest;
 import com.example.admin.dto.crowdfunding.CreateCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.CrowdfundingDonationDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingDonationRecordDto;
+import com.example.admin.dto.crowdfunding.CrowdfundingProjectDetailDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingProjectDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingPublicDetailDto;
+import com.example.admin.dto.crowdfunding.ManageCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.ReviewCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.UpdateCrowdfundingProjectRequest;
 import com.example.admin.security.RequiresPermission;
 import com.example.admin.security.UserPrincipal;
 import com.example.admin.service.CrowdfundingService;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,6 +57,34 @@ public class CrowdfundingController {
             @RequestParam(defaultValue = "10") long size
     ) {
         return Result.ok(crowdfundingService.listAll(current, size));
+    }
+
+    @GetMapping("/{id}")
+    @RequiresPermission("crowdfunding:list")
+    public Result<CrowdfundingProjectDetailDto> detail(@PathVariable Long id) {
+        return Result.ok(crowdfundingService.getDetail(id));
+    }
+
+    @PutMapping("/{id}/manage")
+    @RequiresPermission("crowdfunding:manage")
+    public Result<CrowdfundingProjectDetailDto> manageUpdate(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id,
+            @Valid @RequestBody ManageCrowdfundingProjectRequest request
+    ) {
+        Long adminUserId = principal == null ? null : principal.userId();
+        return Result.ok(crowdfundingService.manageUpdate(adminUserId, id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    @RequiresPermission("crowdfunding:manage")
+    public Result<Void> delete(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id
+    ) {
+        Long adminUserId = principal == null ? null : principal.userId();
+        crowdfundingService.delete(adminUserId, id);
+        return Result.ok(null);
     }
 
     @PostMapping

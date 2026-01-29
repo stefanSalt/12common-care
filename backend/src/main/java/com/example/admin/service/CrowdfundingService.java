@@ -5,8 +5,10 @@ import com.example.admin.dto.crowdfunding.CreateCrowdfundingDonationRequest;
 import com.example.admin.dto.crowdfunding.CreateCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.CrowdfundingDonationDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingDonationRecordDto;
+import com.example.admin.dto.crowdfunding.CrowdfundingProjectDetailDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingProjectDto;
 import com.example.admin.dto.crowdfunding.CrowdfundingPublicDetailDto;
+import com.example.admin.dto.crowdfunding.ManageCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.ReviewCrowdfundingProjectRequest;
 import com.example.admin.dto.crowdfunding.UpdateCrowdfundingProjectRequest;
 
@@ -16,6 +18,12 @@ public interface CrowdfundingService {
     CrowdfundingPublicDetailDto publicDetail(Long id);
 
     PageResult<CrowdfundingProjectDto> listAll(long current, long size);
+
+    CrowdfundingProjectDetailDto getDetail(Long id);
+
+    CrowdfundingProjectDetailDto manageUpdate(Long adminUserId, Long id, ManageCrowdfundingProjectRequest request);
+
+    void delete(Long adminUserId, Long id);
 
     CrowdfundingProjectDto create(Long userId, CreateCrowdfundingProjectRequest request);
 
