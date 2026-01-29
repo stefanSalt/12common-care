@@ -25,8 +25,8 @@ mysql -h <MYSQL_HOST> -P <MYSQL_PORT> -u <MYSQL_USER> -p
 进入 MySQL 后：
 
 ```sql
-CREATE DATABASE admin_base DEFAULT CHARACTER SET utf8mb4;
-USE admin_base;
+CREATE DATABASE common_care DEFAULT CHARACTER SET utf8mb4;
+USE common_care;
 SOURCE <PATH_TO_REPO>/.kiro/specs/admin-base/schema.sql;
 SOURCE <PATH_TO_REPO>/.kiro/specs/admin-base/seed.sql;
 ```
@@ -43,7 +43,7 @@ ALTER TABLE sys_user ADD COLUMN avatar_file_id BIGINT NULL COMMENT 'sys_file.id 
 
 - `MYSQL_HOST`（默认 `172.25.48.1`）
 - `MYSQL_PORT`（默认 `3307`）
-- `MYSQL_DB`（默认 `admin_base`）
+- `MYSQL_DB`（默认 `common_care`）
 - `MYSQL_USER`（默认 `root`）
 - `MYSQL_PASSWORD`（无默认值）
 

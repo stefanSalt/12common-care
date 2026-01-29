@@ -41,7 +41,7 @@
 - 通过环境变量注入 MySQL 连接（避免提交明文密码）：
   - `MYSQL_HOST`（默认 `172.25.48.1`）
   - `MYSQL_PORT`（默认 `3307`）
-  - `MYSQL_DB`（默认 `admin_base`）
+  - `MYSQL_DB`（默认 `common_care`）
   - `MYSQL_USER`（默认 `root`）
   - `MYSQL_PASSWORD`（无默认值）
 - JWT：

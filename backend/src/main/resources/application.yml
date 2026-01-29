@@ -5,10 +5,14 @@ spring:
   application:
     name: admin-base
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:172.25.48.1}:${MYSQL_PORT:3307}/${MYSQL_DB:admin_base}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${MYSQL_HOST:172.25.48.1}:${MYSQL_PORT:3307}/${MYSQL_DB:common_care}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: ${MYSQL_USER:root}
     password: ${MYSQL_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 app:
   jwt:
@@ -28,6 +32,7 @@ springdoc:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       logic-delete-field: deleted
