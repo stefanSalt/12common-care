@@ -182,3 +182,38 @@ CREATE UNIQUE INDEX IF NOT EXISTS uk_biz_activity_favorite ON biz_activity_favor
 CREATE INDEX IF NOT EXISTS idx_biz_activity_favorite_activity_id ON biz_activity_favorite(activity_id);
 CREATE INDEX IF NOT EXISTS idx_biz_activity_favorite_user_id ON biz_activity_favorite(user_id);
 CREATE INDEX IF NOT EXISTS idx_biz_activity_favorite_created_at ON biz_activity_favorite(created_at);
+
+CREATE TABLE IF NOT EXISTS biz_crowdfunding_project (
+  id BIGINT NOT NULL,
+  title VARCHAR(128) NOT NULL,
+  cover_file_id BIGINT NOT NULL,
+  content TEXT NOT NULL,
+  target_amount DECIMAL(12,2) NOT NULL,
+  raised_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  start_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  end_time TIMESTAMP NOT NULL,
+  status VARCHAR(16) NOT NULL,
+  enabled TINYINT NOT NULL DEFAULT 1,
+  deleted TINYINT NOT NULL DEFAULT 0,
+  created_by BIGINT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+CREATE INDEX IF NOT EXISTS idx_biz_cf_project_status_end_time ON biz_crowdfunding_project(status, end_time);
+CREATE INDEX IF NOT EXISTS idx_biz_cf_project_created_by ON biz_crowdfunding_project(created_by);
+CREATE INDEX IF NOT EXISTS idx_biz_cf_project_cover_file_id ON biz_crowdfunding_project(cover_file_id);
+
+CREATE TABLE IF NOT EXISTS biz_crowdfunding_donation (
+  id BIGINT NOT NULL,
+  project_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  is_anonymous TINYINT NOT NULL DEFAULT 0,
+  remark VARCHAR(255) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+CREATE INDEX IF NOT EXISTS idx_biz_cf_donation_project_id ON biz_crowdfunding_donation(project_id);
+CREATE INDEX IF NOT EXISTS idx_biz_cf_donation_user_id ON biz_crowdfunding_donation(user_id);
+CREATE INDEX IF NOT EXISTS idx_biz_cf_donation_created_at ON biz_crowdfunding_donation(created_at);

@@ -187,3 +187,38 @@ CREATE TABLE biz_activity_favorite (
   KEY idx_biz_activity_favorite_user_id (user_id),
   KEY idx_biz_activity_favorite_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE biz_crowdfunding_project (
+  id BIGINT NOT NULL,
+  title VARCHAR(128) NOT NULL,
+  cover_file_id BIGINT NOT NULL COMMENT 'sys_file.id (PUBLIC)',
+  content TEXT NOT NULL COMMENT 'HTML',
+  target_amount DECIMAL(12,2) NOT NULL,
+  raised_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  start_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  end_time DATETIME NOT NULL,
+  status VARCHAR(16) NOT NULL COMMENT 'PENDING/APPROVED/REJECTED',
+  enabled TINYINT NOT NULL DEFAULT 1 COMMENT '0-disabled 1-enabled',
+  deleted TINYINT NOT NULL DEFAULT 0 COMMENT '0-normal 1-deleted',
+  created_by BIGINT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_biz_cf_project_status_end_time (status, end_time),
+  KEY idx_biz_cf_project_created_by (created_by),
+  KEY idx_biz_cf_project_cover_file_id (cover_file_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE biz_crowdfunding_donation (
+  id BIGINT NOT NULL,
+  project_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  is_anonymous TINYINT NOT NULL DEFAULT 0 COMMENT '0-no 1-yes',
+  remark VARCHAR(255) DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_biz_cf_donation_project_id (project_id),
+  KEY idx_biz_cf_donation_user_id (user_id),
+  KEY idx_biz_cf_donation_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

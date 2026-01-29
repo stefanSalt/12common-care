@@ -92,6 +92,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/banners/public").permitAll()
                         // Public activities list/detail for frontend.
                         .requestMatchers(HttpMethod.GET, "/api/activities/public", "/api/activities/*/public").permitAll()
+                        // Public crowdfunding list/detail for frontend.
+                        .requestMatchers(HttpMethod.GET, "/api/crowdfunding/public", "/api/crowdfunding/*/public").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

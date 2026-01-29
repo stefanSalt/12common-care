@@ -50,6 +50,11 @@ MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES 
 MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (164, 'activityFavorite:list', '活动收藏记录', '查看活动收藏记录', 0);
 MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (165, 'stats:view', '数据统计', '查看统计数据', 0);
 
+MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (170, 'crowdfunding:list', '众筹项目列表', '查看众筹项目列表', 0);
+MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (171, 'crowdfunding:manage', '众筹项目管理', '管理众筹项目（编辑/删除）', 0);
+MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (172, 'crowdfunding:review', '众筹项目审核', '审核众筹项目', 0);
+MERGE INTO sys_permission (id, code, name, description, deleted) KEY(id) VALUES (173, 'crowdfundingDonation:list', '众筹捐款记录', '查看众筹捐款记录', 0);
+
 -- A pre-created PUBLIC file for banner images (no physical file needed for API tests).
 MERGE INTO sys_file (id, original_name, stored_name, path, size, content_type, visibility, user_id, deleted) KEY(id)
 VALUES (5001, 'banner.png', '5001.png', '2026/01/29/5001.png', 123, 'image/png', 'PUBLIC', 1, 0);
@@ -83,3 +88,8 @@ MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2062
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2063, 10, 163);
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2064, 10, 164);
 MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2065, 10, 165);
+
+MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2070, 10, 170);
+MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2071, 10, 171);
+MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2072, 10, 172);
+MERGE INTO sys_role_permission (id, role_id, permission_id) KEY(id) VALUES (2073, 10, 173);
