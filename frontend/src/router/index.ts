@@ -255,6 +255,24 @@ const router = createRouter({
           meta: { requiresAuth: true, permission: 'activity:list' },
         },
         {
+          path: 'activity-signups',
+          name: 'admin-activity-signups',
+          component: ActivitiesView,
+          meta: { requiresAuth: true, permission: 'activitySignup:list' },
+        },
+        {
+          path: 'activity-donations',
+          name: 'admin-activity-donations',
+          component: ActivitiesView,
+          meta: { requiresAuth: true, permission: 'activityDonation:list' },
+        },
+        {
+          path: 'activity-favorites',
+          name: 'admin-activity-favorites',
+          component: ActivitiesView,
+          meta: { requiresAuth: true, permission: 'activityFavorite:list' },
+        },
+        {
           path: 'stats',
           name: 'admin-stats',
           component: StatsView,

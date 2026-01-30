@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import type { UploadProps } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as echarts from 'echarts'
@@ -22,6 +23,7 @@ import RichTextEditor from '../../components/RichTextEditor.vue'
 import { useUserStore } from '../../stores/user'
 
 const userStore = useUserStore()
+const route = useRoute()
 
 const uploadHeaders = computed<Record<string, string>>(() => {
   const headers: Record<string, string> = {}
@@ -44,6 +46,28 @@ function toLocalDateTimeString(d: Date) {
 }
 
 const activeTab = ref<'activities' | 'signups' | 'donations' | 'favorites' | 'stats'>('activities')
+
+function syncActiveTabByRoutePath(path: string) {
+  let desired: typeof activeTab.value | null = null
+  if (path === '/admin/activity-signups') desired = 'signups'
+  else if (path === '/admin/activity-donations') desired = 'donations'
+  else if (path === '/admin/activity-favorites') desired = 'favorites'
+  else if (path === '/admin/activities') desired = 'activities'
+
+  if (!desired) return
+
+  if (desired === 'signups' && !userStore.permissions.includes('activitySignup:list')) return
+  if (desired === 'donations' && !userStore.permissions.includes('activityDonation:list')) return
+  if (desired === 'favorites' && !userStore.permissions.includes('activityFavorite:list')) return
+
+  if (activeTab.value !== desired) activeTab.value = desired
+}
+
+onMounted(() => syncActiveTabByRoutePath(route.path))
+watch(
+  () => route.path,
+  (p) => syncActiveTabByRoutePath(p),
+)
 
 // -------- Activities tab --------
 const activitiesLoading = ref(false)
