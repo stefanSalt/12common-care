@@ -222,3 +222,30 @@ CREATE TABLE biz_crowdfunding_donation (
   KEY idx_biz_cf_donation_user_id (user_id),
   KEY idx_biz_cf_donation_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE biz_story (
+  id BIGINT NOT NULL,
+  title VARCHAR(128) NOT NULL,
+  cover_file_id BIGINT NOT NULL COMMENT 'sys_file.id (PUBLIC)',
+  content TEXT NOT NULL COMMENT 'HTML',
+  enabled TINYINT NOT NULL DEFAULT 1 COMMENT '0-disabled 1-enabled',
+  deleted TINYINT NOT NULL DEFAULT 0 COMMENT '0-normal 1-deleted',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_biz_story_enabled_created_at (enabled, created_at),
+  KEY idx_biz_story_cover_file_id (cover_file_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE biz_comment (
+  id BIGINT NOT NULL,
+  target_type VARCHAR(16) NOT NULL COMMENT 'STORY',
+  target_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  content TEXT NOT NULL,
+  deleted TINYINT NOT NULL DEFAULT 0 COMMENT '0-normal 1-deleted',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_biz_comment_target_created_at (target_type, target_id, created_at),
+  KEY idx_biz_comment_user_created_at (user_id, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

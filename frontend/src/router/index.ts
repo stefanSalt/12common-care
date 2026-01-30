@@ -10,6 +10,9 @@ import ActivityDetailView from '../views/activity/ActivityDetailView.vue'
 import MySignupsView from '../views/activity/MySignupsView.vue'
 import MyFavoritesView from '../views/activity/MyFavoritesView.vue'
 import MyDonationsView from '../views/activity/MyDonationsView.vue'
+import StoriesListView from '../views/story/StoriesListView.vue'
+import StoryDetailView from '../views/story/StoryDetailView.vue'
+import MyCommentsView from '../views/story/MyCommentsView.vue'
 import CrowdfundingListView from '../views/crowdfunding/CrowdfundingListView.vue'
 import CrowdfundingCreateView from '../views/crowdfunding/CrowdfundingCreateView.vue'
 import CrowdfundingDetailView from '../views/crowdfunding/CrowdfundingDetailView.vue'
@@ -19,6 +22,8 @@ import FilesView from '../views/admin/FilesView.vue'
 import BannersView from '../views/admin/BannersView.vue'
 import ActivitiesView from '../views/admin/ActivitiesView.vue'
 import StatsView from '../views/admin/StatsView.vue'
+import StoriesView from '../views/admin/StoriesView.vue'
+import CommentsView from '../views/admin/CommentsView.vue'
 import CrowdfundingDonationsView from '../views/admin/CrowdfundingDonationsView.vue'
 import CrowdfundingProjectsView from '../views/admin/CrowdfundingProjectsView.vue'
 import AdminMessagesView from '../views/admin/MessagesView.vue'
@@ -84,6 +89,25 @@ const router = createRouter({
       ],
     },
     {
+      path: '/stories',
+      component: FrontendLayout,
+      meta: { public: true },
+      children: [
+        {
+          path: '',
+          name: 'front-stories',
+          component: StoriesListView,
+          meta: { public: true },
+        },
+        {
+          path: ':id',
+          name: 'front-story-detail',
+          component: StoryDetailView,
+          meta: { public: true },
+        },
+      ],
+    },
+    {
       path: '/crowdfunding',
       component: FrontendLayout,
       meta: { public: true },
@@ -135,6 +159,12 @@ const router = createRouter({
           path: 'donations',
           name: 'front-my-donations',
           component: MyDonationsView,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'comments',
+          name: 'front-my-comments',
+          component: MyCommentsView,
           meta: { requiresAuth: true },
         },
         {
@@ -229,6 +259,18 @@ const router = createRouter({
           name: 'admin-stats',
           component: StatsView,
           meta: { requiresAuth: true, permission: 'stats:view' },
+        },
+        {
+          path: 'stories',
+          name: 'admin-stories',
+          component: StoriesView,
+          meta: { requiresAuth: true, permission: 'story:list' },
+        },
+        {
+          path: 'comments',
+          name: 'admin-comments',
+          component: CommentsView,
+          meta: { requiresAuth: true, permission: 'comment:list' },
         },
         {
           path: 'crowdfunding',

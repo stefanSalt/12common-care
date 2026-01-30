@@ -63,6 +63,11 @@ INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (171, '
 INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (172, 'crowdfunding:review', '众筹项目审核', '审核众筹项目', 0);
 INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (173, 'crowdfundingDonation:list', '众筹捐款记录', '查看众筹捐款记录', 0);
 
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (180, 'story:list', '爱心事迹列表', '查看爱心事迹列表', 0);
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (181, 'story:manage', '爱心事迹管理', '新增/编辑/删除爱心事迹', 0);
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (182, 'comment:list', '评论列表', '查看评论列表', 0);
+INSERT INTO sys_permission (id, code, name, description, deleted) VALUES (183, 'comment:manage', '评论管理', '删除评论', 0);
+
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2000, 10, 100);
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2001, 10, 101);
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2002, 10, 102);
@@ -97,3 +102,8 @@ INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2070, 10, 1
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2071, 10, 171);
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2072, 10, 172);
 INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2073, 10, 173);
+
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2080, 10, 180);
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2081, 10, 181);
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2082, 10, 182);
+INSERT INTO sys_role_permission (id, role_id, permission_id) VALUES (2083, 10, 183);

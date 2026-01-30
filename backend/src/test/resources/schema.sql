@@ -217,3 +217,30 @@ CREATE TABLE IF NOT EXISTS biz_crowdfunding_donation (
 CREATE INDEX IF NOT EXISTS idx_biz_cf_donation_project_id ON biz_crowdfunding_donation(project_id);
 CREATE INDEX IF NOT EXISTS idx_biz_cf_donation_user_id ON biz_crowdfunding_donation(user_id);
 CREATE INDEX IF NOT EXISTS idx_biz_cf_donation_created_at ON biz_crowdfunding_donation(created_at);
+
+CREATE TABLE IF NOT EXISTS biz_story (
+  id BIGINT NOT NULL,
+  title VARCHAR(128) NOT NULL,
+  cover_file_id BIGINT NOT NULL,
+  content TEXT NOT NULL,
+  enabled TINYINT NOT NULL DEFAULT 1,
+  deleted TINYINT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+CREATE INDEX IF NOT EXISTS idx_biz_story_enabled_created_at ON biz_story(enabled, created_at);
+CREATE INDEX IF NOT EXISTS idx_biz_story_cover_file_id ON biz_story(cover_file_id);
+
+CREATE TABLE IF NOT EXISTS biz_comment (
+  id BIGINT NOT NULL,
+  target_type VARCHAR(16) NOT NULL,
+  target_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  content TEXT NOT NULL,
+  deleted TINYINT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+CREATE INDEX IF NOT EXISTS idx_biz_comment_target_created_at ON biz_comment(target_type, target_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_biz_comment_user_created_at ON biz_comment(user_id, created_at);

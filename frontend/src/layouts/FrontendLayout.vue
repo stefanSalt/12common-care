@@ -19,6 +19,7 @@ const avatarUrl = computed(() => {
 const activeNav = computed(() => {
   const p = route.path
   if (p.startsWith('/activities')) return '/activities'
+  if (p.startsWith('/stories')) return '/stories'
   if (p.startsWith('/crowdfunding')) return '/crowdfunding'
   if (p.startsWith('/messages')) return '/messages'
   return '/'
@@ -49,6 +50,10 @@ function goMyFavorites() {
 
 function goMyDonations() {
   router.push('/my/donations')
+}
+
+function goMyComments() {
+  router.push('/my/comments')
 }
 
 function goMyCrowdfundingDonations() {
@@ -102,6 +107,7 @@ function logout() {
         >
           <el-menu-item index="/">首页</el-menu-item>
           <el-menu-item index="/activities">公益活动</el-menu-item>
+          <el-menu-item index="/stories">爱心事迹</el-menu-item>
           <el-menu-item index="/crowdfunding">爱心众筹</el-menu-item>
           <el-menu-item index="/messages">留言</el-menu-item>
         </el-menu>
@@ -120,6 +126,7 @@ function logout() {
                   <el-dropdown-item @click="goMySignups">我的报名</el-dropdown-item>
                   <el-dropdown-item @click="goMyFavorites">我的收藏</el-dropdown-item>
                   <el-dropdown-item @click="goMyDonations">我的捐赠</el-dropdown-item>
+                  <el-dropdown-item @click="goMyComments">我的评论</el-dropdown-item>
                   <el-dropdown-item @click="goMyCrowdfundingDonations">众筹捐款</el-dropdown-item>
                   <el-dropdown-item @click="goMyCrowdfundingProjects">我的众筹</el-dropdown-item>
                   <el-dropdown-item @click="goCrowdfundingNew">发起众筹</el-dropdown-item>
