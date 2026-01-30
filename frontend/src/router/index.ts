@@ -33,6 +33,7 @@ import AdminMessagesView from '../views/admin/MessagesView.vue'
 import NotificationsView from '../views/admin/NotificationsView.vue'
 import PermissionsView from '../views/admin/PermissionsView.vue'
 import RolesView from '../views/admin/RolesView.vue'
+import AdminUsersView from '../views/admin/AdminUsersView.vue'
 import UsersView from '../views/admin/UsersView.vue'
 import FrontMessagesView from '../views/message/MessagesView.vue'
 import ProfileView from '../views/profile/ProfileView.vue'
@@ -220,6 +221,12 @@ const router = createRouter({
           name: 'admin-home',
           component: HomeView,
           meta: { requiresAuth: true },
+        },
+        {
+          path: 'admin-users',
+          name: 'admin-admin-users',
+          component: AdminUsersView,
+          meta: { requiresAuth: true, permission: 'user:list' },
         },
         {
           path: 'users',

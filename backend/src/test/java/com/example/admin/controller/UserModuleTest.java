@@ -76,6 +76,49 @@ class UserModuleTest {
         org.junit.jupiter.api.Assertions.assertFalse(found);
     }
 
+    @Test
+    void listSupportsRoleFilters() throws Exception {
+        String adminToken = login("admin", "admin123");
+
+        MvcResult adminListResult = mockMvc.perform(get("/api/users")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .param("current", "1")
+                        .param("size", "50")
+                        .param("roleCode", "admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andReturn();
+
+        JsonNode adminListJson = objectMapper.readTree(adminListResult.getResponse().getContentAsString());
+        boolean foundAdmin = false;
+        for (JsonNode item : adminListJson.at("/data/records")) {
+            if ("admin".equals(item.at("/username").asText())) {
+                foundAdmin = true;
+                break;
+            }
+        }
+        org.junit.jupiter.api.Assertions.assertTrue(foundAdmin);
+
+        MvcResult excludeAdminResult = mockMvc.perform(get("/api/users")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .param("current", "1")
+                        .param("size", "200")
+                        .param("excludeRoleCode", "admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andReturn();
+
+        JsonNode excludeAdminJson = objectMapper.readTree(excludeAdminResult.getResponse().getContentAsString());
+        boolean hasAdmin = false;
+        for (JsonNode item : excludeAdminJson.at("/data/records")) {
+            if ("admin".equals(item.at("/username").asText())) {
+                hasAdmin = true;
+                break;
+            }
+        }
+        org.junit.jupiter.api.Assertions.assertFalse(hasAdmin);
+    }
+
     private long createUser(String token, String username, String password) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + token)
@@ -105,4 +148,3 @@ class UserModuleTest {
         return prefix + "_" + UUID.randomUUID();
     }
 }
-

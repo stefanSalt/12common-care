@@ -14,7 +14,7 @@ const page = reactive({ current: 1, size: 10, total: 0 })
 async function load() {
   loading.value = true
   try {
-    const data = await listUsers(page.current, page.size, undefined, 'admin')
+    const data = await listUsers(page.current, page.size, 'admin')
     rows.value = data.records ?? []
     page.total = Number(data.total ?? 0)
     page.current = Number(data.current ?? page.current)
@@ -59,6 +59,21 @@ function openEdit(row: UserDto) {
   editDialogOpen.value = true
 }
 
+const roleOptions = ref<RoleDto[]>([])
+const roleLoading = ref(false)
+
+async function ensureRolesLoaded() {
+  if (roleOptions.value.length > 0) return
+  roleLoading.value = true
+  try {
+    roleOptions.value = await listRoles()
+  } catch (e: any) {
+    ElMessage.error(e?.message ?? '加载角色列表失败')
+  } finally {
+    roleLoading.value = false
+  }
+}
+
 async function submitUser() {
   if (editMode.value === 'create') {
     if (!form.username.trim()) return ElMessage.warning('请输入用户名')
@@ -68,12 +83,21 @@ async function submitUser() {
   saving.value = true
   try {
     if (editMode.value === 'create') {
-      await createUser({
+      const created = await createUser({
         username: form.username.trim(),
         password: form.password,
         nickname: form.nickname || undefined,
         status: form.status,
       })
+
+      // Ensure the created user is an admin, otherwise it won't show in this list.
+      await ensureRolesLoaded()
+      const adminRoleId = roleOptions.value.find((r) => r.code === 'admin')?.id
+      if (adminRoleId) {
+        await setUserRoles(created.id, [adminRoleId])
+      } else {
+        ElMessage.warning('创建成功，但未找到 admin 角色，请到“用户”页面手工分配管理员角色')
+      }
     } else {
       await updateUser(editingId.value, {
         nickname: form.nickname || undefined,
@@ -92,7 +116,7 @@ async function submitUser() {
 
 async function removeUser(row: UserDto) {
   try {
-    await ElMessageBox.confirm(`确认删除用户 ${row.username}？`, '提示', { type: 'warning' })
+    await ElMessageBox.confirm(`确认删除管理员 ${row.username}？`, '提示', { type: 'warning' })
     saving.value = true
     await deleteUser(row.id)
     ElMessage.success('删除成功')
@@ -107,20 +131,6 @@ async function removeUser(row: UserDto) {
 const assignDialogOpen = ref(false)
 const assignUserId = ref('')
 const selectedRoleIds = ref<string[]>([])
-const roleOptions = ref<RoleDto[]>([])
-const roleLoading = ref(false)
-
-async function ensureRolesLoaded() {
-  if (roleOptions.value.length > 0) return
-  roleLoading.value = true
-  try {
-    roleOptions.value = await listRoles()
-  } catch (e: any) {
-    ElMessage.error(e?.message ?? '加载角色列表失败')
-  } finally {
-    roleLoading.value = false
-  }
-}
 
 async function openAssignRoles(row: UserDto) {
   assignUserId.value = row.id
@@ -148,8 +158,11 @@ async function submitRoles() {
   <div style="display: flex; flex-direction: column; gap: 12px">
     <el-card>
       <div style="display: flex; gap: 8px; align-items: center">
-        <el-button v-permission="'user:create'" type="primary" @click="openCreate">新增用户</el-button>
+        <el-button v-permission="'user:create'" type="primary" @click="openCreate">新增管理员</el-button>
         <el-button @click="load">刷新</el-button>
+      </div>
+      <div style="margin-top: 8px; color: var(--el-text-color-secondary); font-size: 12px">
+        本页仅展示拥有 admin 角色的用户。新增管理员会自动分配 admin 角色。
       </div>
     </el-card>
 
@@ -202,7 +215,7 @@ async function submitRoles() {
       </div>
     </el-card>
 
-    <el-dialog v-model="editDialogOpen" :title="editMode === 'create' ? '新增用户' : '编辑用户'" width="420px">
+    <el-dialog v-model="editDialogOpen" :title="editMode === 'create' ? '新增管理员' : '编辑管理员'" width="420px">
       <el-form label-position="top">
         <el-form-item v-if="editMode === 'create'" label="用户名">
           <el-input v-model="form.username" autocomplete="off" />
@@ -241,3 +254,4 @@ async function submitRoles() {
     </el-dialog>
   </div>
 </template>
+

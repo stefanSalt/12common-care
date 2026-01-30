@@ -8,7 +8,7 @@ import com.example.admin.dto.user.UserDto;
 
 public interface UserService {
 
-    PageResult<UserDto> list(long current, long size);
+    PageResult<UserDto> list(long current, long size, String roleCode, String excludeRoleCode);
 
     UserDto getById(Long id);
 
@@ -20,4 +20,3 @@ public interface UserService {
 
     void setRoles(Long userId, SetUserRolesRequest request);
 }
-

@@ -33,9 +33,11 @@ public class UserController {
     @RequiresPermission("user:list")
     public Result<PageResult<UserDto>> list(
             @RequestParam(defaultValue = "1") long current,
-            @RequestParam(defaultValue = "10") long size
+            @RequestParam(defaultValue = "10") long size,
+            @RequestParam(required = false) String roleCode,
+            @RequestParam(required = false) String excludeRoleCode
     ) {
-        return Result.ok(userService.list(current, size));
+        return Result.ok(userService.list(current, size, roleCode, excludeRoleCode));
     }
 
     @GetMapping("/{id}")
@@ -70,4 +72,3 @@ public class UserController {
         return Result.ok(null);
     }
 }
-

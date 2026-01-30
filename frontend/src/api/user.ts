@@ -14,8 +14,15 @@ export type UpdateUserRequest = {
   status?: number
 }
 
-export async function listUsers(current = 1, size = 10) {
-  const res = await request.get<ApiResult<PageResult<UserDto>>>('/users', { params: { current, size } })
+export async function listUsers(
+  current = 1,
+  size = 10,
+  roleCode?: string,
+  excludeRoleCode?: string,
+) {
+  const res = await request.get<ApiResult<PageResult<UserDto>>>('/users', {
+    params: { current, size, roleCode, excludeRoleCode },
+  })
   return res.data.data
 }
 
@@ -38,4 +45,3 @@ export async function setUserRoles(userId: string, roleIds: string[]) {
   const res = await request.put<ApiResult<null>>(`/users/${userId}/roles`, { roleIds })
   return res.data.data
 }
-

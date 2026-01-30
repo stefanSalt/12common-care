@@ -33,6 +33,7 @@ type MenuItem = { label: string; index: string; icon: Component; permission?: st
 
 const menuItems = computed<MenuItem[]>(() => [
   { label: '首页', index: '/admin', icon: House },
+  { label: '管理员', index: '/admin/admin-users', icon: Avatar, permission: 'user:list' },
   { label: '用户', index: '/admin/users', icon: User, permission: 'user:list' },
   { label: '角色', index: '/admin/roles', icon: Key, permission: 'role:list' },
   { label: '权限', index: '/admin/permissions', icon: Setting, permission: 'permission:list' },

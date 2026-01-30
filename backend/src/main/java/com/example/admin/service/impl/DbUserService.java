@@ -17,11 +17,15 @@ import com.example.admin.mapper.SysUserMapper;
 import com.example.admin.mapper.SysUserRoleMapper;
 import com.example.admin.service.PermissionService;
 import com.example.admin.service.UserService;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,13 +54,43 @@ public class DbUserService implements UserService {
     }
 
     @Override
-    public PageResult<UserDto> list(long current, long size) {
+    public PageResult<UserDto> list(long current, long size, String roleCode, String excludeRoleCode) {
+        String includeRoleCode = normalizeRoleCode(roleCode);
+        String exclude = normalizeRoleCode(excludeRoleCode);
+
+        Set<Long> includeUserIds = includeRoleCode == null ? null : resolveUserIdsByRoleCode(includeRoleCode);
+        if (includeUserIds != null && includeUserIds.isEmpty()) {
+            return emptyPage(current, size);
+        }
+
+        Set<Long> excludeUserIds = exclude == null ? null : resolveUserIdsByRoleCode(exclude);
+
+        var wrapper = Wrappers.lambdaQuery(SysUser.class).orderByAsc(SysUser::getId);
+        if (includeUserIds != null) {
+            wrapper.in(SysUser::getId, includeUserIds);
+        }
+        if (excludeUserIds != null && !excludeUserIds.isEmpty()) {
+            wrapper.notIn(SysUser::getId, excludeUserIds);
+        }
+
         Page<SysUser> page = userMapper.selectPage(
                 new Page<>(current, size),
-                Wrappers.lambdaQuery(SysUser.class).orderByAsc(SysUser::getId)
+                wrapper
         );
 
-        List<UserDto> records = page.getRecords().stream().map(this::toDtoNoAuthInfo).toList();
+        List<Long> userIds = page.getRecords().stream()
+                .map(SysUser::getId)
+                .filter(Objects::nonNull)
+                .toList();
+
+        Map<Long, List<RoleDto>> rolesByUserId = getRolesByUserIds(userIds);
+        List<UserDto> records = page.getRecords().stream()
+                .map(u -> {
+                    UserDto dto = toDtoNoAuthInfo(u);
+                    dto.setRoles(rolesByUserId.getOrDefault(u.getId(), List.of()));
+                    return dto;
+                })
+                .toList();
 
         PageResult<UserDto> result = new PageResult<>();
         result.setRecords(records);
@@ -192,5 +226,85 @@ public class DbUserService implements UserService {
         dto.setCode(role.getCode());
         dto.setName(role.getName());
         return dto;
+    }
+
+    private PageResult<UserDto> emptyPage(long current, long size) {
+        PageResult<UserDto> result = new PageResult<>();
+        result.setRecords(List.of());
+        result.setTotal(0);
+        result.setCurrent(current);
+        result.setSize(size);
+        return result;
+    }
+
+    private String normalizeRoleCode(String roleCode) {
+        if (roleCode == null) {
+            return null;
+        }
+        String t = roleCode.trim();
+        return t.isBlank() ? null : t;
+    }
+
+    private Set<Long> resolveUserIdsByRoleCode(String roleCode) {
+        if (roleCode == null || roleCode.isBlank()) {
+            return Set.of();
+        }
+
+        List<SysRole> roles = roleMapper.selectList(Wrappers.lambdaQuery(SysRole.class).eq(SysRole::getCode, roleCode));
+        List<Long> roleIds = roles.stream()
+                .map(SysRole::getId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        if (roleIds.isEmpty()) {
+            return Set.of();
+        }
+
+        return userRoleMapper.selectList(Wrappers.lambdaQuery(SysUserRole.class).in(SysUserRole::getRoleId, roleIds))
+                .stream()
+                .map(SysUserRole::getUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    private Map<Long, List<RoleDto>> getRolesByUserIds(List<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Map.of();
+        }
+
+        List<SysUserRole> userRoles = userRoleMapper.selectList(
+                Wrappers.lambdaQuery(SysUserRole.class).in(SysUserRole::getUserId, userIds)
+        );
+        if (userRoles.isEmpty()) {
+            return Map.of();
+        }
+
+        Set<Long> roleIds = userRoles.stream()
+                .map(SysUserRole::getRoleId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (roleIds.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<Long, RoleDto> roleDtoById = roleMapper.selectList(Wrappers.lambdaQuery(SysRole.class).in(SysRole::getId, roleIds))
+                .stream()
+                .filter(r -> r.getId() != null)
+                .collect(Collectors.toMap(SysRole::getId, this::toRoleDto, (a, b) -> a));
+
+        Map<Long, List<RoleDto>> result = new HashMap<>();
+        for (SysUserRole ur : userRoles) {
+            Long userId = ur.getUserId();
+            Long roleId = ur.getRoleId();
+            if (userId == null || roleId == null) {
+                continue;
+            }
+            RoleDto role = roleDtoById.get(roleId);
+            if (role == null) {
+                continue;
+            }
+            result.computeIfAbsent(userId, k -> new ArrayList<>()).add(role);
+        }
+        return result;
     }
 }
