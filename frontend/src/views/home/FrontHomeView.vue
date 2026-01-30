@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import type { BannerDto } from '../../api/banner'
 import { listPublicBanners } from '../../api/banner'
 import { listPublicCrowdfundingProjects, type CrowdfundingProjectDto } from '../../api/crowdfunding'
+import { listPublicStories, type StoryDto } from '../../api/story'
 import type { NotificationDto } from '../../api/notification'
 import { listNotifications } from '../../api/notification'
 import { useUserStore } from '../../stores/user'
@@ -15,10 +16,12 @@ const userStore = useUserStore()
 const loadingBanners = ref(false)
 const loadingAnnouncements = ref(false)
 const loadingCrowdfunding = ref(false)
+const loadingStories = ref(false)
 
 const banners = ref<BannerDto[]>([])
 const announcements = ref<NotificationDto[]>([])
 const latestCrowdfunding = ref<CrowdfundingProjectDto[]>([])
+const latestStories = ref<StoryDto[]>([])
 
 const isLoggedIn = computed(() => !!userStore.token)
 
@@ -90,8 +93,20 @@ async function loadCrowdfunding() {
   }
 }
 
+async function loadStories() {
+  loadingStories.value = true
+  try {
+    const data = await listPublicStories(1, 6)
+    latestStories.value = data.records ?? []
+  } catch (e: any) {
+    ElMessage.error(e?.message ?? '事迹加载失败')
+  } finally {
+    loadingStories.value = false
+  }
+}
+
 async function load() {
-  await Promise.all([loadBanners(), loadAnnouncements(), loadCrowdfunding()])
+  await Promise.all([loadBanners(), loadAnnouncements(), loadCrowdfunding(), loadStories()])
 }
 
 onMounted(load)
@@ -103,6 +118,14 @@ function goCrowdfundingList() {
 function goCrowdfundingDetail(id: string) {
   router.push(`/crowdfunding/${id}`)
 }
+
+function goStoryList() {
+  router.push('/stories')
+}
+
+function goStoryDetail(id: string) {
+  router.push(`/stories/${id}`)
+}
 </script>
 
 <template>
@@ -111,7 +134,9 @@ function goCrowdfundingDetail(id: string) {
       <template #header>
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
           <div style="font-weight: 700">系统首页</div>
-          <el-button size="small" :loading="loadingBanners || loadingAnnouncements" @click="load">刷新</el-button>
+          <el-button size="small" :loading="loadingBanners || loadingAnnouncements || loadingCrowdfunding || loadingStories" @click="load">
+            刷新
+          </el-button>
         </div>
       </template>
 
@@ -230,6 +255,41 @@ function goCrowdfundingDetail(id: string) {
                 <div style="margin-top: 10px">
                   <el-progress :percentage="percent(item)" :stroke-width="10" />
                 </div>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+    </el-card>
+
+    <el-card>
+      <template #header>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+          <div style="font-weight: 700">最新爱心事迹</div>
+          <el-button size="small" @click="goStoryList">查看更多</el-button>
+        </div>
+      </template>
+
+      <div v-loading="loadingStories">
+        <el-empty v-if="latestStories.length === 0 && !loadingStories" description="暂无文章" />
+
+        <el-row v-else :gutter="12">
+          <el-col v-for="item in latestStories" :key="item.id" :xs="24" :sm="12" :md="8">
+            <div
+              style="
+                border: 1px solid rgba(15, 23, 42, 0.08);
+                border-radius: 12px;
+                overflow: hidden;
+                background: #fff;
+                cursor: pointer;
+                margin-bottom: 12px;
+              "
+              @click="goStoryDetail(item.id)"
+            >
+              <img :src="coverUrl(item.coverFileId)" alt="cover" style="width: 100%; height: 140px; object-fit: cover" />
+              <div style="padding: 10px 12px">
+                <div style="font-weight: 800; color: #111827; line-height: 1.2">{{ item.title }}</div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--el-text-color-secondary)">发布时间：{{ item.createdAt }}</div>
               </div>
             </div>
           </el-col>
