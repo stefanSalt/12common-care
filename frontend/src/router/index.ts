@@ -21,6 +21,9 @@ import MyCrowdfundingProjectsView from '../views/crowdfunding/MyCrowdfundingProj
 import FilesView from '../views/admin/FilesView.vue'
 import BannersView from '../views/admin/BannersView.vue'
 import ActivitiesView from '../views/admin/ActivitiesView.vue'
+import ActivitySignupsView from '../views/admin/ActivitySignupsView.vue'
+import ActivityDonationsView from '../views/admin/ActivityDonationsView.vue'
+import ActivityFavoritesView from '../views/admin/ActivityFavoritesView.vue'
 import StatsView from '../views/admin/StatsView.vue'
 import StoriesView from '../views/admin/StoriesView.vue'
 import CommentsView from '../views/admin/CommentsView.vue'
@@ -257,19 +260,19 @@ const router = createRouter({
         {
           path: 'activity-signups',
           name: 'admin-activity-signups',
-          component: ActivitiesView,
+          component: ActivitySignupsView,
           meta: { requiresAuth: true, permission: 'activitySignup:list' },
         },
         {
           path: 'activity-donations',
           name: 'admin-activity-donations',
-          component: ActivitiesView,
+          component: ActivityDonationsView,
           meta: { requiresAuth: true, permission: 'activityDonation:list' },
         },
         {
           path: 'activity-favorites',
           name: 'admin-activity-favorites',
-          component: ActivitiesView,
+          component: ActivityFavoritesView,
           meta: { requiresAuth: true, permission: 'activityFavorite:list' },
         },
         {

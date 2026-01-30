@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import type { UploadProps } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as echarts from 'echarts'
@@ -8,22 +7,15 @@ import {
   createActivity,
   deleteActivity,
   getActivityDetail,
-  listActivityDonations,
-  listActivityFavorites,
-  listActivitySignups,
   listAllActivities,
   updateActivity,
-  type ActivityDonationDto,
   type ActivityDto,
-  type ActivityFavoriteDto,
-  type ActivitySignupDto,
 } from '../../api/activity'
 import { getActivitySignupRatio } from '../../api/stats'
 import RichTextEditor from '../../components/RichTextEditor.vue'
 import { useUserStore } from '../../stores/user'
 
 const userStore = useUserStore()
-const route = useRoute()
 
 const uploadHeaders = computed<Record<string, string>>(() => {
   const headers: Record<string, string> = {}
@@ -45,29 +37,7 @@ function toLocalDateTimeString(d: Date) {
   )}`
 }
 
-const activeTab = ref<'activities' | 'signups' | 'donations' | 'favorites' | 'stats'>('activities')
-
-function syncActiveTabByRoutePath(path: string) {
-  let desired: typeof activeTab.value | null = null
-  if (path === '/admin/activity-signups') desired = 'signups'
-  else if (path === '/admin/activity-donations') desired = 'donations'
-  else if (path === '/admin/activity-favorites') desired = 'favorites'
-  else if (path === '/admin/activities') desired = 'activities'
-
-  if (!desired) return
-
-  if (desired === 'signups' && !userStore.permissions.includes('activitySignup:list')) return
-  if (desired === 'donations' && !userStore.permissions.includes('activityDonation:list')) return
-  if (desired === 'favorites' && !userStore.permissions.includes('activityFavorite:list')) return
-
-  if (activeTab.value !== desired) activeTab.value = desired
-}
-
-onMounted(() => syncActiveTabByRoutePath(route.path))
-watch(
-  () => route.path,
-  (p) => syncActiveTabByRoutePath(p),
-)
+const activeTab = ref<'activities' | 'stats'>('activities')
 
 // -------- Activities tab --------
 const activitiesLoading = ref(false)
@@ -216,64 +186,6 @@ async function removeActivity(row: ActivityDto) {
   }
 }
 
-// -------- Records tabs --------
-const signupRows = ref<ActivitySignupDto[]>([])
-const signupLoading = ref(false)
-const signupPage = reactive({ current: 1, size: 10, total: 0, activityId: '' })
-
-async function loadSignups() {
-  signupLoading.value = true
-  try {
-    const data = await listActivitySignups(signupPage.current, signupPage.size, signupPage.activityId.trim() || undefined)
-    signupRows.value = data.records ?? []
-    signupPage.total = Number(data.total ?? 0)
-    signupPage.current = Number(data.current ?? signupPage.current)
-    signupPage.size = Number(data.size ?? signupPage.size)
-  } catch (e: any) {
-    ElMessage.error(e?.message ?? '加载失败')
-  } finally {
-    signupLoading.value = false
-  }
-}
-
-const donationRows = ref<ActivityDonationDto[]>([])
-const donationLoading = ref(false)
-const donationPage = reactive({ current: 1, size: 10, total: 0, activityId: '' })
-
-async function loadDonations() {
-  donationLoading.value = true
-  try {
-    const data = await listActivityDonations(donationPage.current, donationPage.size, donationPage.activityId.trim() || undefined)
-    donationRows.value = data.records ?? []
-    donationPage.total = Number(data.total ?? 0)
-    donationPage.current = Number(data.current ?? donationPage.current)
-    donationPage.size = Number(data.size ?? donationPage.size)
-  } catch (e: any) {
-    ElMessage.error(e?.message ?? '加载失败')
-  } finally {
-    donationLoading.value = false
-  }
-}
-
-const favoriteRows = ref<ActivityFavoriteDto[]>([])
-const favoriteLoading = ref(false)
-const favoritePage = reactive({ current: 1, size: 10, total: 0, activityId: '' })
-
-async function loadFavorites() {
-  favoriteLoading.value = true
-  try {
-    const data = await listActivityFavorites(favoritePage.current, favoritePage.size, favoritePage.activityId.trim() || undefined)
-    favoriteRows.value = data.records ?? []
-    favoritePage.total = Number(data.total ?? 0)
-    favoritePage.current = Number(data.current ?? favoritePage.current)
-    favoritePage.size = Number(data.size ?? favoritePage.size)
-  } catch (e: any) {
-    ElMessage.error(e?.message ?? '加载失败')
-  } finally {
-    favoriteLoading.value = false
-  }
-}
-
 // -------- Stats tab --------
 const statsLoading = ref(false)
 const chartEl = ref<HTMLDivElement | null>(null)
@@ -317,9 +229,6 @@ async function loadStats() {
 watch(
   () => activeTab.value,
   (tab) => {
-    if (tab === 'signups') loadSignups()
-    if (tab === 'donations') loadDonations()
-    if (tab === 'favorites') loadFavorites()
     if (tab === 'stats') loadStats()
   },
 )
@@ -404,122 +313,6 @@ onBeforeUnmount(() => {
                   activityPage.size = s
                   activityPage.current = 1
                   loadActivities()
-                }
-              "
-            />
-          </div>
-        </el-tab-pane>
-
-        <el-tab-pane v-permission="'activitySignup:list'" label="报名记录" name="signups">
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px">
-            <el-input v-model="signupPage.activityId" placeholder="按 activityId 过滤（可选）" style="max-width: 320px" />
-            <el-button @click="loadSignups">查询</el-button>
-          </div>
-
-          <el-table :data="signupRows" v-loading="signupLoading" style="width: 100%">
-            <el-table-column prop="id" label="编号" width="200" />
-            <el-table-column prop="activityId" label="活动ID" width="200" />
-            <el-table-column prop="activityTitle" label="活动标题" min-width="220" />
-            <el-table-column prop="userId" label="用户ID" width="200" />
-            <el-table-column prop="username" label="用户名" width="140" />
-            <el-table-column prop="status" label="状态" width="120" />
-            <el-table-column prop="signedAt" label="报名时间" width="170" />
-          </el-table>
-
-          <div style="display: flex; justify-content: flex-end; margin-top: 12px">
-            <el-pagination
-              layout="total, prev, pager, next, sizes"
-              :total="signupPage.total"
-              :page-size="signupPage.size"
-              :current-page="signupPage.current"
-              @current-change="
-                (p: number) => {
-                  signupPage.current = p
-                  loadSignups()
-                }
-              "
-              @size-change="
-                (s: number) => {
-                  signupPage.size = s
-                  signupPage.current = 1
-                  loadSignups()
-                }
-              "
-            />
-          </div>
-        </el-tab-pane>
-
-        <el-tab-pane v-permission="'activityDonation:list'" label="捐赠记录" name="donations">
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px">
-            <el-input v-model="donationPage.activityId" placeholder="按 activityId 过滤（可选）" style="max-width: 320px" />
-            <el-button @click="loadDonations">查询</el-button>
-          </div>
-
-          <el-table :data="donationRows" v-loading="donationLoading" style="width: 100%">
-            <el-table-column prop="id" label="编号" width="200" />
-            <el-table-column prop="activityId" label="活动ID" width="200" />
-            <el-table-column prop="activityTitle" label="活动标题" min-width="220" />
-            <el-table-column prop="userId" label="用户ID" width="200" />
-            <el-table-column prop="username" label="用户名" width="140" />
-            <el-table-column prop="amount" label="金额" width="120" />
-            <el-table-column prop="createdAt" label="时间" width="170" />
-          </el-table>
-
-          <div style="display: flex; justify-content: flex-end; margin-top: 12px">
-            <el-pagination
-              layout="total, prev, pager, next, sizes"
-              :total="donationPage.total"
-              :page-size="donationPage.size"
-              :current-page="donationPage.current"
-              @current-change="
-                (p: number) => {
-                  donationPage.current = p
-                  loadDonations()
-                }
-              "
-              @size-change="
-                (s: number) => {
-                  donationPage.size = s
-                  donationPage.current = 1
-                  loadDonations()
-                }
-              "
-            />
-          </div>
-        </el-tab-pane>
-
-        <el-tab-pane v-permission="'activityFavorite:list'" label="收藏记录" name="favorites">
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px">
-            <el-input v-model="favoritePage.activityId" placeholder="按 activityId 过滤（可选）" style="max-width: 320px" />
-            <el-button @click="loadFavorites">查询</el-button>
-          </div>
-
-          <el-table :data="favoriteRows" v-loading="favoriteLoading" style="width: 100%">
-            <el-table-column prop="id" label="编号" width="200" />
-            <el-table-column prop="activityId" label="活动ID" width="200" />
-            <el-table-column prop="activityTitle" label="活动标题" min-width="220" />
-            <el-table-column prop="userId" label="用户ID" width="200" />
-            <el-table-column prop="username" label="用户名" width="140" />
-            <el-table-column prop="createdAt" label="收藏时间" width="170" />
-          </el-table>
-
-          <div style="display: flex; justify-content: flex-end; margin-top: 12px">
-            <el-pagination
-              layout="total, prev, pager, next, sizes"
-              :total="favoritePage.total"
-              :page-size="favoritePage.size"
-              :current-page="favoritePage.current"
-              @current-change="
-                (p: number) => {
-                  favoritePage.current = p
-                  loadFavorites()
-                }
-              "
-              @size-change="
-                (s: number) => {
-                  favoritePage.size = s
-                  favoritePage.current = 1
-                  loadFavorites()
                 }
               "
             />
