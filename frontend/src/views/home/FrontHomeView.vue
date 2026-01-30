@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import type { BannerDto } from '../../api/banner'
 import { listPublicBanners } from '../../api/banner'
 import { listPublicCrowdfundingProjects, type CrowdfundingProjectDto } from '../../api/crowdfunding'
+import { listPublicActivities, type ActivityDto } from '../../api/activity'
 import { listPublicStories, type StoryDto } from '../../api/story'
 import type { NotificationDto } from '../../api/notification'
 import { listNotifications } from '../../api/notification'
@@ -16,11 +17,13 @@ const userStore = useUserStore()
 const loadingBanners = ref(false)
 const loadingAnnouncements = ref(false)
 const loadingCrowdfunding = ref(false)
+const loadingActivities = ref(false)
 const loadingStories = ref(false)
 
 const banners = ref<BannerDto[]>([])
 const announcements = ref<NotificationDto[]>([])
 const latestCrowdfunding = ref<CrowdfundingProjectDto[]>([])
+const latestActivities = ref<ActivityDto[]>([])
 const latestStories = ref<StoryDto[]>([])
 
 const isLoggedIn = computed(() => !!userStore.token)
@@ -42,6 +45,13 @@ function isEnded(endTime?: string) {
 function percent(item: CrowdfundingProjectDto) {
   const target = Number(item.targetAmount ?? 0)
   const raised = Number(item.raisedAmount ?? 0)
+  if (!target || target <= 0) return 0
+  return Math.min(100, Math.round((raised / target) * 100))
+}
+
+function activityPercent(item: ActivityDto) {
+  const target = Number(item.donationTarget ?? 0)
+  const raised = Number(item.donatedAmount ?? 0)
   if (!target || target <= 0) return 0
   return Math.min(100, Math.round((raised / target) * 100))
 }
@@ -93,6 +103,18 @@ async function loadCrowdfunding() {
   }
 }
 
+async function loadActivities() {
+  loadingActivities.value = true
+  try {
+    const data = await listPublicActivities(1, 6)
+    latestActivities.value = data.records ?? []
+  } catch (e: any) {
+    ElMessage.error(e?.message ?? '公益活动加载失败')
+  } finally {
+    loadingActivities.value = false
+  }
+}
+
 async function loadStories() {
   loadingStories.value = true
   try {
@@ -106,7 +128,7 @@ async function loadStories() {
 }
 
 async function load() {
-  await Promise.all([loadBanners(), loadAnnouncements(), loadCrowdfunding(), loadStories()])
+  await Promise.all([loadBanners(), loadAnnouncements(), loadCrowdfunding(), loadActivities(), loadStories()])
 }
 
 onMounted(load)
@@ -126,6 +148,14 @@ function goStoryList() {
 function goStoryDetail(id: string) {
   router.push(`/stories/${id}`)
 }
+
+function goActivitiesList() {
+  router.push('/activities')
+}
+
+function goActivityDetail(id: string) {
+  router.push(`/activities/${id}`)
+}
 </script>
 
 <template>
@@ -134,7 +164,11 @@ function goStoryDetail(id: string) {
       <template #header>
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
           <div style="font-weight: 700">系统首页</div>
-          <el-button size="small" :loading="loadingBanners || loadingAnnouncements || loadingCrowdfunding || loadingStories" @click="load">
+          <el-button
+            size="small"
+            :loading="loadingBanners || loadingAnnouncements || loadingCrowdfunding || loadingActivities || loadingStories"
+            @click="load"
+          >
             刷新
           </el-button>
         </div>
@@ -254,6 +288,50 @@ function goStoryDetail(id: string) {
 
                 <div style="margin-top: 10px">
                   <el-progress :percentage="percent(item)" :stroke-width="10" />
+                </div>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+    </el-card>
+
+    <el-card>
+      <template #header>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+          <div style="font-weight: 700">最新公益活动</div>
+          <el-button size="small" @click="goActivitiesList">查看更多</el-button>
+        </div>
+      </template>
+
+      <div v-loading="loadingActivities">
+        <el-empty v-if="latestActivities.length === 0 && !loadingActivities" description="暂无公益活动" />
+
+        <el-row v-else :gutter="12">
+          <el-col v-for="item in latestActivities" :key="item.id" :xs="24" :sm="12" :md="8">
+            <div
+              style="
+                border: 1px solid rgba(15, 23, 42, 0.08);
+                border-radius: 12px;
+                overflow: hidden;
+                background: #fff;
+                cursor: pointer;
+                margin-bottom: 12px;
+              "
+              @click="goActivityDetail(item.id)"
+            >
+              <img :src="coverUrl(item.coverFileId)" alt="cover" style="width: 100%; height: 140px; object-fit: cover" />
+              <div style="padding: 10px 12px">
+                <div style="font-weight: 800; color: #111827; line-height: 1.2">{{ item.title }}</div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--el-text-color-secondary)">
+                  时间：{{ item.startTime }} ~ {{ item.endTime }}
+                </div>
+
+                <div v-if="item.donateEnabled && item.donationTarget" style="margin-top: 10px">
+                  <div style="font-size: 12px; color: var(--el-text-color-secondary); margin-bottom: 6px">
+                    捐赠进度：{{ item.donatedAmount ?? 0 }} / {{ item.donationTarget }}
+                  </div>
+                  <el-progress :percentage="activityPercent(item)" :stroke-width="10" />
                 </div>
               </div>
             </div>
