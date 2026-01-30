@@ -40,6 +40,10 @@ function goMessages() {
   router.push('/messages')
 }
 
+function goNotifications() {
+  router.push('/notifications')
+}
+
 function goMySignups() {
   router.push('/my/signups')
 }
@@ -130,6 +134,7 @@ function logout() {
                   <el-dropdown-item @click="goMyCrowdfundingDonations">众筹捐款</el-dropdown-item>
                   <el-dropdown-item @click="goMyCrowdfundingProjects">我的众筹</el-dropdown-item>
                   <el-dropdown-item @click="goCrowdfundingNew">发起众筹</el-dropdown-item>
+                  <el-dropdown-item @click="goNotifications">通知中心</el-dropdown-item>
                   <el-dropdown-item @click="goMessages">我的留言</el-dropdown-item>
                   <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>

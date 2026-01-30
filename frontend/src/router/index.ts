@@ -37,6 +37,7 @@ import AdminUsersView from '../views/admin/AdminUsersView.vue'
 import UsersView from '../views/admin/UsersView.vue'
 import FrontMessagesView from '../views/message/MessagesView.vue'
 import ProfileView from '../views/profile/ProfileView.vue'
+import MyNotificationsView from '../views/notification/MyNotificationsView.vue'
 import { useUserStore } from '../stores/user'
 
 declare module 'vue-router' {
@@ -207,6 +208,19 @@ const router = createRouter({
           path: '',
           name: 'front-messages',
           component: FrontMessagesView,
+          meta: { requiresAuth: true },
+        },
+      ],
+    },
+    {
+      path: '/notifications',
+      component: FrontendLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          name: 'front-notifications',
+          component: MyNotificationsView,
           meta: { requiresAuth: true },
         },
       ],
